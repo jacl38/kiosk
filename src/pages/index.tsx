@@ -1,3 +1,3 @@
 export default function Index() {
-	return ( <p>Index</p> );
+	return ( <p>Index Page</p> );
 }
