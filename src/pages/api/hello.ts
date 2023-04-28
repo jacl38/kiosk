@@ -1,33 +1,38 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { getCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { AuthFormat, adminAccountExists, sessionTimeout } from './auth';
+import getCollection from './db';
 
-import { MongoClient, MongoClientOptions } from "mongodb";
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+	try {
+		
+		if(!await adminAccountExists()) {
+			res.status(400).send({ error: "Admin account does not exist." });
+			return;
+		}
 
-const uri = process.env.MONGODB_URI;
-const options: MongoClientOptions = {
+		const authCollection = await getCollection("auth");
+		
+		const userToken = getCookie("token", { req, res });
+		const adminAccount = await authCollection.findOne({}) as unknown as AuthFormat;
 
-}
+		console.log(`User token: ${userToken}`);
+		console.log(`Admin token: ${adminAccount.adminToken}`);
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
+		if(userToken !== adminAccount.adminToken) {
+			res.status(400).send({ error: "User token is invalid." });
+			return;
+		}
 
-if(uri) {
-	client = new MongoClient(uri, options);
-	clientPromise = client.connect();
-}
+		if((Date.now() - adminAccount.adminLastLogin) / 1000 >= sessionTimeout) {
+			res.status(400).send({ error: "Admin token has expired" });
+			return;
+		}
 
-type Data = {
-	name: string
-}
+		res.status(200).send({ message: "Admin account exists, user token is valid." });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-	const client = await clientPromise;
-
-	const db = client.db("kiosk");
-
-	await db.collection("kiosk-test").insertOne({ testField: 1234 });
-
-	const testNum = await db.collection("kiosk-test").countDocuments();
-
-	res.status(200).json({ name: `tested ${testNum} times` });
+	} catch(e) {
+		console.error(e);
+		res.status(400).send({ error: e });
+	}
 }
