@@ -5,10 +5,12 @@ const commonStyles = {
 		outerContainer: tw(
 			`bg-stone-200 dark:bg-gray-800`,
 			`h-full`,
-			`flex flex-col p-8`,
+			`relative`,
+			`flex flex-col`,
 			`overflow-scroll`,
 			`text-stone-700 dark:text-stone-300`,
-			`transition-colors`
+			`transition-colors`,
+			`overflow-hidden`
 		),
 		inputBox: tw(
 			`px-2 py-1`,
@@ -30,12 +32,14 @@ const commonStyles = {
 		separator: tw(
 			`my-2 h-0.5`,
 			`border-none`,
-			`bg-stone-300 dark:bg-gray-700`,
+			`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-10`,
 			`transition-colors`
 		),
 		title: tw(
-			`text-xl font-semibold`,
-			`mb-4`
+			`text-xl font-semibold`
+		),
+		subtitle: tw(
+			`text-lg font-semibold`,
 		),
 		errorText: tw(
 			`font-bold`,
@@ -45,7 +49,7 @@ const commonStyles = {
 			`before:absolute before:-ml-6`
 		),
 		backButton: tw(
-			`fixed left-4 top-4`,
+			`absolute left-4 top-4`,
 			`text-5xl`,
 			`flex items-center justify-center`,
 			`pb-3 pr-1`,
@@ -54,6 +58,22 @@ const commonStyles = {
 			`rounded-full`,
 			`transition-colors`
 		),
+		checkbox: tw(
+			`w-5 h-5`,
+			`rounded-xl checked:rounded-md`,
+			`bg-stone-300 dark:bg-gray-300`,
+			`checked:bg-stone-500 checked:dark:bg-gray-500`,
+			`checked:border-stone-400 checked:dark:border-gray-300`,
+			`border border-stone-500 dark:border-gray-400`,
+			`relative`,
+			`checked:after:content-['✓']`,
+			`after:text-stone-300 after:dark:text-gray-300`,
+			`after:font-black`,
+			`after:absolute after:inset-0`,
+			`after:flex after:items-center after:justify-center`,
+			`transition-all`,
+			`appearance-none`,
+		)
 	},
 	loadingSpinner: tw(
 		`m-auto`,

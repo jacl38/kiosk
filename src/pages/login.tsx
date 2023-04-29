@@ -1,10 +1,11 @@
 import DarkButton from "@/components/DarkButton";
 import { tw } from "@/utility/tailwindUtil";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthRequest, adminAccountExists } from "./api/auth";
 import { useRouter } from "next/router";
 import commonStyles from "@/styles/common";
 import useAuth from "@/hooks/useAuth";
+import Link from "next/link";
 
 const styles = {
 	outerContainer: tw(
@@ -47,14 +48,14 @@ const styles = {
 	)
 }
 
-export default function Login(props: { hasAdminAccount: boolean }) {
+export default function Login() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [incorrect, setIncorrect] = useState(false);
 	
 	const router = useRouter();
 
-	const { authenticated } = useAuth((valid: boolean, hasAdminAccount: boolean) => {
+	useAuth((valid: boolean, hasAdminAccount: boolean) => {
 		if(valid || !hasAdminAccount) {
 			router.push("/");
 		}
@@ -76,7 +77,8 @@ export default function Login(props: { hasAdminAccount: boolean }) {
 		});
 
 		if(res.status === 200) {
-			router.push("/");
+			const redirect = new URLSearchParams(window.location.search).get("redirect") ?? "";
+			router.push(redirect);
 		} else {
 			setIncorrect(true);
 		}
@@ -98,12 +100,7 @@ export default function Login(props: { hasAdminAccount: boolean }) {
 				incorrect && <p className={styles.errorText}>Incorrect username or password. Try again.</p>
 			}
 		</form>
+		<Link href="/" className={commonStyles.management.backButton}>&lsaquo;</Link>
 		<DarkButton />
 	</div>
-}
-
-export async function getServerSideProps() {
-	const hasAdminAccount = await adminAccountExists();
-
-	return { props: { hasAdminAccount } }
 }

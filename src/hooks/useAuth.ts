@@ -2,13 +2,13 @@ import { AuthRequest, adminAccountExists } from "@/pages/api/auth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-export default function useAuth(then?: (valid: boolean, hasAdminAccount: boolean) => void) {
+export default function useAuth(then?: (authenticated: boolean, hasAdminAccount: boolean) => void) {
 
 	const router = useRouter();
 
 	const defaultThen = then ?? ((valid: boolean, hasAdminAccount: boolean) => {
 		if(!valid) {
-			router.push(hasAdminAccount ? "/login" : "/");
+			router.push(hasAdminAccount ? `/login?redirect=${router.route.substring(1)}` : "/");
 		}
 	});
 

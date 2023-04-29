@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import getCollection from "./db";
 import { BinaryLike, createHash } from "crypto";
 import { validateCredentials } from "../setup";
-import { getCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 export type AuthCredentials = { username: string, password: string }
 export type AuthIntent = "query" | "login" | "logout" | "signup"
@@ -22,7 +22,27 @@ export type AuthFormat = {
 }
 
 /** Seconds before admin account session is invalidated and user needs to log in again. */
-export const sessionTimeout = 60;
+export const sessionTimeout = 60 * 60 * 24;
+
+export async function query(req: NextApiRequest, res: NextApiResponse) {
+
+	const authCollection = await getCollection("auth");
+	const adminAccount = await authCollection.findOne({}) as unknown as AuthFormat;
+
+	const userToken = getCookie("token", { req, res }) ?? "";
+
+	const hasAdminAccount = adminAccount.adminToken !== undefined;
+	const authenticated = hash(userToken as string) === adminAccount.adminToken;
+	const adminTimeout = (Date.now() - adminAccount.adminLastLogin) / 1000 >= sessionTimeout;
+
+	const body = { hasAdminAccount, authenticated: authenticated && !adminTimeout }
+
+	const valid = hasAdminAccount && authenticated && !adminTimeout;
+
+	const status = valid ? 200 : 401;
+
+	return { status, body };
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	try {
@@ -63,20 +83,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					break;
 				}
 				case "query": {
-					const userToken = getCookie("token", { req, res }) ?? "";
-
-					const hasAdminAccount = adminAccount.adminToken !== undefined;
-					const authenticated = hash(userToken as string) === adminAccount.adminToken;
-					const adminTimeout = (Date.now() - adminAccount.adminLastLogin) / 1000 >= sessionTimeout;
-
-					const body = { hasAdminAccount, authenticated: authenticated && !adminTimeout }
-
-					const valid = hasAdminAccount && authenticated && !adminTimeout;
-
-					const status = valid ? 200 : 401;
-
+					const { status, body } = await query(req, res);
 					res.status(status).send(body);
-					return;
 
 					break;
 				}
@@ -87,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					}
 
 					const sessionToken = hash(`${Date.now()}${request.credentials.password}`);
-					setCookie("token", sessionToken, { req, res, maxAge: sessionTimeout, secure: true });
+					setCookie("token", sessionToken, { req, res, maxAge: sessionTimeout, secure: process.env.NODE_ENV !== "development" });
 
 					await authCollection.replaceOne({
 						adminUsername: request.credentials.username,
@@ -104,7 +112,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					break;
 				}
 				case "logout": {
-					
+					deleteCookie("token", { req, res });
+					res.status(200).send({ message: "Logged out" });
 					break;
 				}
 			}
@@ -112,11 +121,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 	} catch(e) {
 		console.error(e);
-		res.status(400).send({});
+		res.status(500).send({ error: e });
 	}
 }
 
-function hash(message: BinaryLike) {
+export function hash(message: BinaryLike) {
 	return createHash("sha512").update(message).digest("hex");
 }
 
