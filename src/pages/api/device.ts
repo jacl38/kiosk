@@ -3,7 +3,7 @@ import { AuthFormat, hash, query } from "./auth";
 import getCollection from "./db";
 import { getCookie, setCookie } from "cookies-next";
 
-export type DeviceType = "kiosk" | "orders";
+export type DeviceType = "kiosk" | "orders" | "manage";
 export type DeviceInfo = {
 	id: number,
 	name: string,
@@ -44,7 +44,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 			switch (request.intent) {
 				case "open": {
-					const authenticated = (await query(req, res)).status === 200;
 					if(authenticated) {
 						pairingEnabled = true;
 						clearTimeout(pairingTimer);
@@ -56,6 +55,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "pair": {
+					if(authenticated) {
+						res.status(200).send({ id: 0 });
+						return;
+					}
+
 					const deviceToken = (getCookie("device-token", { req, res }) ?? "") as string;
 					if(deviceToken && authorizedDevices.map(d => d.token).includes(hash(deviceToken))) {
 						const foundDevice = authorizedDevices.find(d => d.token === hash(deviceToken));
