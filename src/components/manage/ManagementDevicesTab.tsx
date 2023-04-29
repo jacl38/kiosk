@@ -133,7 +133,7 @@ export default function ManagementDevicesTab() {
 			{
 				devices.length > 0
 				? <>
-					{devices.map((device, i) => <button
+					{devices.map((device, i) => <button key={i}
 						onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
 						className={styles.listItem(selectedDeviceID === device.id)}>
 						<div className="flex justify-between space-x-2">

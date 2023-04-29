@@ -7,7 +7,7 @@ export default function MenuButton(props: { size: number } & ButtonHTMLAttribute
 		className={tw("flex flex-col justify-around", props.className ?? "")}
 		style={{ width: props.size, height: props.size }}>
 		{[...Array(3)].map((_, i) => {
-			return <div className="w-full bg-gray-700 dark:bg-stone-300 rounded-full" style={{ height: props.size/8 }}></div>
+			return <div key={i} className="w-full bg-gray-700 dark:bg-stone-300 rounded-full" style={{ height: props.size/8 }}></div>
 		})}
 	</button>
 }
