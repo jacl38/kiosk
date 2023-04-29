@@ -4,10 +4,12 @@ import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil"
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import TextConfirmField from "./TextConfirmField";
 
 const styles = {
 	outerContainer: tw(
 		`flex max-md:flex-col`,
+		`h-full`,
 		`md:space-x-4 max-md:space-y-4`,
 		`relative`,
 	),
@@ -89,6 +91,25 @@ export default function ManagementDevicesTab() {
 			body: JSON.stringify(request)
 		});
 		console.log(await response.json());
+	}
+
+	async function renameSelectedDevice(newName: string) {
+		if(selectedDeviceID === undefined) return;
+
+		const request: PairRequest = {
+			intent: "rename",
+			deviceID: selectedDeviceID,
+			newName
+		}
+
+		const response = await fetch("/api/device", {
+			method: "POST",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(request)
+		});
 	}
 
 	async function signalPair() {
@@ -189,7 +210,7 @@ export default function ManagementDevicesTab() {
 			}
 		</div>
 
-		<div className={styles.deviceDetails.container}>
+		<div className={styles.deviceDetails.container} onClick={e => e.stopPropagation()}>
 			<span className={styles.deviceDetails.pairingContainer}>
 				<label className={commonStyles.management.subtitle} htmlFor="pairing-checkbox">Enable pairing: </label>
 				<input
@@ -202,9 +223,14 @@ export default function ManagementDevicesTab() {
 				selectedDevice !== undefined
 				? <>
 					<div className="text-center">
-						<h2 className={commonStyles.management.title}>{selectedDevice?.name}</h2>
-						<p>{selectedDevice?.id}</p>
-						<p>{formatPairDate(selectedDevice.pairDate)}</p>
+						{/* <input id="rename-device" className={tw(commonStyles.management.inputBox, "text-center")} type="text" value={selectedDevice?.name} /> */}
+						{/* <button className={commonStyles.management.button + " -mr-12 ml-2"}>&rsaquo;</button> */}
+						<TextConfirmField
+							inputProps={{ type: "text", placeholder: selectedDevice.name }}
+							onSubmit={renameSelectedDevice}
+						/>
+						<p>ID: {selectedDevice?.id}</p>
+						<p>Paired on {formatPairDate(selectedDevice.pairDate)}</p>
 					</div>
 					<button onClick={deleteSelectedDevice} className={commonStyles.management.button}>Remove Device</button>
 				</> : <h2 className={commonStyles.management.title}>Select a device from the list</h2>
