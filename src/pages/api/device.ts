@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { query } from "./auth";
+import { AuthFormat, hash, query } from "./auth";
+import getCollection from "./db";
+import { getCookie, setCookie } from "cookies-next";
 
 export type DeviceType = "kiosk" | "orders";
 export type DeviceInfo = {
@@ -7,11 +9,18 @@ export type DeviceInfo = {
 	name: string,
 	token: string,
 	type: DeviceType,
-	uptime: number
+	pairDate: number
 }
 
+export type PairIntent = "pair" | "open" | "query" | "delete";
 export type PairRequest = {
-	intent: "open" | "pair"
+	intent: "pair",
+	deviceType?: DeviceType
+} | {
+	intent: "open" | "query"
+} | {
+	intent: "delete",
+	deviceID: number
 }
 
 let pairingEnabled = false;
@@ -24,6 +33,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	try {
 		if(req.method === "POST") {
 			const request = req.body as PairRequest;
+			const authCollection = await getCollection("auth");
+			const adminAccount = await authCollection.findOne({}) as unknown as AuthFormat;
+			const authorizedDevices = adminAccount.connectedClients as unknown as DeviceInfo[] ?? [];
 
 			switch (request.intent) {
 				case "open": {
@@ -36,9 +48,88 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						return;
 					}
 					res.status(401).send({ error: "Unauthorized" });
+					return;
 				}
 				case "pair": {
-					
+					const deviceToken = (getCookie("device-token", { req, res }) ?? "") as string;
+					if(deviceToken && authorizedDevices.map(d => d.token).includes(hash(deviceToken))) {
+						const foundDevice = authorizedDevices.find(d => d.token === hash(deviceToken));
+
+						if(foundDevice?.type !== request.deviceType) {
+							res.status(401).send({ error: "Device type error" });
+							return;
+						}
+
+						const deviceID = foundDevice?.id;
+						res.status(200).send({ id: deviceID });
+						return;
+					}
+
+					if(pairingEnabled) {
+						const ids = authorizedDevices.map(d => d.id).sort((a, b) => a - b);
+
+						let lowestUnusedDeviceID = 1;
+						const highestUsedDeviceID = ids[ids.length - 1] ?? 1;
+						for(let i = 1; i <= highestUsedDeviceID + 1; i++) {
+							if(!ids.includes(i)) {
+								lowestUnusedDeviceID = i;
+								break;
+							}
+						}
+
+						const newToken = hash(`${new Date()}${Math.random()}`);
+						
+						setCookie("device-token", newToken, { req, res, secure: process.env.NODE_ENV !== "development" });
+
+						const info: DeviceInfo = {
+							id: lowestUnusedDeviceID,
+							name: `New ${request.deviceType ?? "device"} screen`,
+							pairDate: Date.now(),
+							type: request.deviceType ?? "kiosk",
+							token: hash(newToken)
+						}
+
+						authorizedDevices.push(info);
+
+						authCollection.replaceOne({}, {
+							...adminAccount,
+							connectedClients: authorizedDevices
+						} as AuthFormat);
+
+						res.status(200).send({ message: "Paired" });
+						return;
+					}
+
+					res.status(401).send({ error: "Unauthorized" });
+					return;
+				}
+				case "query": {
+					const authenticated = (await query(req, res)).status === 200;
+					if(authenticated) {
+						res.status(200).send({ devices: authorizedDevices });
+						return;
+					}
+					res.status(401).send({ error: "Unauthorized" });
+					return;
+				}
+				case "delete": {
+					const authenticated = (await query(req, res)).status === 200;
+					if(authenticated) {
+						const deviceExists = authorizedDevices.find(d => d.id === request.deviceID);
+						if(!deviceExists) {
+							res.status(404).send({ error: "Device not found" });
+							return;
+						}
+						
+						authCollection.replaceOne({}, {
+							...adminAccount,
+							connectedClients: authorizedDevices.filter(d => d.id !== request.deviceID)
+						} as AuthFormat);
+
+						res.status(200).send({ message: "Deleted" });
+						return;
+					}
+					res.status(401).send({ error: "Unauthorized" });
 				}
 			}
 		}

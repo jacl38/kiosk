@@ -13,7 +13,7 @@ const styles = {
 	),
 	listContainer: tw(
 		`w-full`,
-		`space-y-2`,
+		`space-y-4`,
 	),
 	listItem: (selected: boolean) => tw(
 		`p-4`,
@@ -57,33 +57,8 @@ const styles = {
 	}
 }
 
-function fakeHash() {
-	const hex = "0123456789abcdef";
-	return [...Array(128)].map(_ => hex[Math.floor(Math.random() * 16)]).join("");
-}
-
-const devices: DeviceInfo[] = [
-	{ id: 123, name: "device-name jlakwjlkwa rklwaj rlwej", type: "kiosk", token: fakeHash(), uptime: 912830 },
-	{ id: 456, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 53124 },
-	{ id: 183, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 432 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 86400 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-	{ id: 798, name: "device-name", type: "kiosk", token: fakeHash(), uptime: 8965451 },
-];
-
-function formatUptime(uptime: number) {
-	const seconds = uptime % 60;
-	const minutes = Math.floor(uptime / 60) % 60;
-	const hours = Math.floor(uptime / (60 * 60)) % 24;
-	const days = Math.floor(uptime / (60 * 60 * 24));
-
-	return `${days > 0 ? `${days}d ` : ""}${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
+function formatPairDate(pairDate: number) {
+	return new Date(pairDate).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 /** Time before resending signal to keep pairing open (seconds). */
@@ -98,7 +73,23 @@ export default function ManagementDevicesTab() {
 		setSelectedDeviceID(id);
 	}
 
-	const selectedDevice = devices.find(d => d.id === selectedDeviceID);
+	async function deleteSelectedDevice() {
+		if(selectedDeviceID === undefined) return;
+		const request: PairRequest = {
+			intent: "delete",
+			deviceID: selectedDeviceID
+		}
+
+		const response = await fetch("/api/device", {
+			method: "POST",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(request)
+		});
+		console.log(await response.json());
+	}
 
 	async function signalPair() {
 		const request: PairRequest = { intent: "open" }
@@ -122,35 +113,79 @@ export default function ManagementDevicesTab() {
 		}
 		if(pairing) {
 			signalPair();
-			pairTimer.current = setInterval(signalPair, 10 * 1000);
+			pairTimer.current = setInterval(signalPair, signalPairTimeout * 1000);
 		}
 	}, [pairing]);
+
+	const [foundDevices, setFoundDevices] = useState<"unknown" | "error" | "found">("unknown");
+	const [devices, setDevices] = useState<DeviceInfo[]>([]);
+
+	const selectedDevice = devices?.find(d => d.id === selectedDeviceID);
+
+	useEffect(() => {
+		(async function() {
+			const request: PairRequest = {
+				intent: "query"
+			}
+
+			const response = await fetch("/api/device", {
+				method: "POST",
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(request)
+			});
+
+			if(response.status === 200) {
+				const body = await response.json() as { devices: DeviceInfo[] };
+				setDevices(body.devices);
+				setFoundDevices("found");
+			} else {
+				setFoundDevices("error");
+			}
+		})();
+	});
 
 	return <div
 		onClick={() => selectDevice()}
 		className={styles.outerContainer}>
 		<div className={styles.listContainer}>
 			{
-				devices.length > 0
-				? <>
-					{devices.map((device, i) => <button key={i}
-						onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
-						className={styles.listItem(selectedDeviceID === device.id)}>
-						<div className="flex justify-between space-x-2">
-							<div className="flex shrink truncate">
-								<span className="font-bold truncate">{device.name}</span>
-								<span className="font-normal italic ml-1">({device.type})</span>
+				foundDevices === "unknown"
+				? <div className={commonStyles.loadingSpinner}></div>
+				: devices?.length > 0
+					? <>
+						{devices.map((device, i) => <button key={i}
+							onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
+							className={styles.listItem(selectedDeviceID === device.id)}>
+							<div className="flex justify-between space-x-2">
+								<div className="flex shrink truncate">
+									<span className="font-bold truncate">{device.name}</span>
+									<span className="font-normal italic ml-1">({device.type})</span>
+								</div>
+								<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
 							</div>
-							<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
-						</div>
-						<p className="opacity-60">Uptime: {formatUptime(device.uptime)}</p>
-						<span className={styles.arrow}>&rsaquo;</span>
-					</button>)}
-				</>
-				: <div className={styles.listItem(false)}>
-					<p className={commonStyles.management.title}>No devices found</p>
-					<p className={commonStyles.management.subtitle}>Enable pairing mode, then navigate to <a className="underline" href={window.location.origin}>{window.location.origin}</a> on the device</p>
-				</div>
+							<p className="opacity-60">Paired: {formatPairDate(device.pairDate)}</p>
+							<span className={styles.arrow}>&rsaquo;</span>
+						</button>)}
+					</>
+					: <div className={styles.listItem(false)}>
+						<p className={commonStyles.management.title}>
+							{
+								foundDevices === "error"
+									? <>Authorization has expired</>
+									: <>No devices found</>
+							}
+						</p>
+						<p className={commonStyles.management.subtitle}>
+							{
+								foundDevices === "error"
+									? <>Reload the page and log in</>
+									: <>Enable pairing mode, then navigate to <a className="underline" href={window.location.origin}>{window.location.origin}</a> on the device</>
+							}
+						</p>
+					</div>
 			}
 		</div>
 
@@ -169,9 +204,9 @@ export default function ManagementDevicesTab() {
 					<div className="text-center">
 						<h2 className={commonStyles.management.title}>{selectedDevice?.name}</h2>
 						<p>{selectedDevice?.id}</p>
-						<p>{formatUptime(selectedDevice?.uptime ?? 0)}</p>
+						<p>{formatPairDate(selectedDevice.pairDate)}</p>
 					</div>
-					<button className={commonStyles.management.button}>Remove Device</button>
+					<button onClick={deleteSelectedDevice} className={commonStyles.management.button}>Remove Device</button>
 				</> : <h2 className={commonStyles.management.title}>Select a device from the list</h2>
 			}
 		</div>

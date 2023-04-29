@@ -3,6 +3,7 @@ import getCollection from "./db";
 import { BinaryLike, createHash } from "crypto";
 import { validateCredentials } from "../setup";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { DeviceInfo } from "./device";
 
 export type AuthCredentials = { username: string, password: string }
 export type AuthIntent = "query" | "login" | "logout" | "signup"
@@ -11,14 +12,12 @@ export type AuthRequest = {
 	credentials: AuthCredentials
 }
 
-type Client = { id: number, token: string, lastLogin: number }
-
 export type AuthFormat = {
 	adminUsername: string,
 	adminPasswordHash: string,
 	adminLastLogin: number,
 	adminToken: string,
-	connectedClients: Client[]
+	connectedClients: DeviceInfo[]
 }
 
 /** Seconds before admin account session is invalidated and user needs to log in again. */
