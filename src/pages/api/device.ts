@@ -12,7 +12,7 @@ export type DeviceInfo = {
 	pairDate: number
 }
 
-export type PairIntent = "pair" | "open" | "query" | "delete";
+export type PairIntent = "pair" | "open" | "query" | "delete" | "rename";
 export type PairRequest = {
 	intent: "pair",
 	deviceType?: DeviceType
@@ -21,6 +21,10 @@ export type PairRequest = {
 } | {
 	intent: "delete",
 	deviceID: number
+} | {
+	intent: "rename",
+	deviceID: number,
+	newName: string
 }
 
 let pairingEnabled = false;
@@ -36,6 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			const authCollection = await getCollection("auth");
 			const adminAccount = await authCollection.findOne({}) as unknown as AuthFormat;
 			const authorizedDevices = adminAccount.connectedClients as unknown as DeviceInfo[] ?? [];
+			const authenticated = (await query(req, res)).status === 200;
 
 			switch (request.intent) {
 				case "open": {
@@ -104,7 +109,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "query": {
-					const authenticated = (await query(req, res)).status === 200;
 					if(authenticated) {
 						res.status(200).send({ devices: authorizedDevices });
 						return;
@@ -113,7 +117,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "delete": {
-					const authenticated = (await query(req, res)).status === 200;
 					if(authenticated) {
 						const deviceExists = authorizedDevices.find(d => d.id === request.deviceID);
 						if(!deviceExists) {
@@ -130,6 +133,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						return;
 					}
 					res.status(401).send({ error: "Unauthorized" });
+					return;
+				}
+				case "rename": {
+					if(authenticated) {
+						const deviceExists = authorizedDevices.find(d => d.id === request.deviceID);
+						if(!deviceExists) {
+							res.status(404).send({ error: "Device not found" });
+							return;
+						}
+						authCollection.replaceOne({}, {
+							...adminAccount,
+							connectedClients: authorizedDevices.map(d => d.id === request.deviceID ? {...d, name: request.newName} : d)
+						} as AuthFormat);
+
+						res.status(200).send({ message: "Renamed" });
+						return;
+					}
+					res.status(401).send({ error: "Unauthorized" });
+					return;
 				}
 			}
 		}
