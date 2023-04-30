@@ -23,15 +23,15 @@ export default function usePair(type: DeviceType, then?: (paired: boolean) => vo
 					"Content-Type": "application/json"
 				},
 				body: JSON.stringify(request)
-			});
-
-			if(response.status === 200) {
-				const id: number = (await response.json()).id;
-				setID(id);
-				setPaired("paired");
-			} else {
-				setPaired("unpaired");
-			}
+			}).then(async response => {
+				if(response.status === 200) {
+					const id: number = (await response.json()).id;
+					setID(id);
+					setPaired("paired");
+				} else {
+					setPaired("unpaired");
+				}
+			}, reason => console.error(reason));
 		})();
 	}, []);
 

@@ -22,19 +22,19 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 				credentials: { username: "", password: "" }
 			}
 	
-			const res = await fetch("api/auth", {
+			await fetch("api/auth", {
 				method: "POST",
 				headers: {
 					"Accept": "application/json",
 					"Content-Type": "application/json"
 				},
 				body: JSON.stringify(request)
-			});
-
-			const content = await res.json() as { hasAdminAccount: boolean, authenticated: boolean };
-			setAuthenticated(content.authenticated ? "authenticated" : "unauthenticated");
-			setHasAdminAccount(content.hasAdminAccount ? "admin" : "noadmin");
-			defaultThen(content.authenticated, content.hasAdminAccount);
+			}).then(async response => {
+				const content = await response.json() as { hasAdminAccount: boolean, authenticated: boolean };
+				setAuthenticated(content.authenticated ? "authenticated" : "unauthenticated");
+				setHasAdminAccount(content.hasAdminAccount ? "admin" : "noadmin");
+				defaultThen(content.authenticated, content.hasAdminAccount);
+			}, reason => console.error(reason));
 		})();
 	}, []);
 

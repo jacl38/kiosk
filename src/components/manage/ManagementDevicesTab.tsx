@@ -149,22 +149,22 @@ export default function ManagementDevicesTab() {
 				intent: "query"
 			}
 
-			const response = await fetch("/api/device", {
+			await fetch("/api/device", {
 				method: "POST",
 				headers: {
 					"Accept": "application/json",
 					"Content-Type": "application/json"
 				},
 				body: JSON.stringify(request)
-			});
-
-			if(response.status === 200) {
-				const body = await response.json() as { devices: DeviceInfo[] };
-				setDevices(body.devices);
-				setFoundDevices("found");
-			} else {
-				setFoundDevices("error");
-			}
+			}).then(async response => {
+				if(response.status === 200) {
+					const body = await response.json() as { devices: DeviceInfo[] };
+					setDevices(body.devices);
+					setFoundDevices("found");
+				} else {
+					setFoundDevices("error");
+				}
+			}, reason => console.error(reason));
 		})();
 	});
 
