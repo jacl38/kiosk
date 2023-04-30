@@ -1,4 +1,5 @@
 import DarkButton from "@/components/DarkButton";
+import withLoading from "@/components/higherOrder/withLoading";
 import ManagementDevicesTab from "@/components/manage/ManagementDevicesTab";
 import ManagementMenuTab from "@/components/manage/ManagementMenuTab";
 import ManagementReportsTab from "@/components/manage/ManagementReportsTab";
@@ -11,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
+// Sets up list of components to render as tabs
 const tabs: ManagementTabProps[] = [
 	{ name: "Menu", children: <ManagementMenuTab /> },
 	{ name: "Reports", children: <ManagementReportsTab /> },
@@ -59,10 +61,13 @@ export default function Manage() {
 
 	return <div className={tw(commonStyles.management.outerContainer, "p-8")}>
 		{
-			authenticated === "authenticated" ? <>
+			withLoading(authenticated === "unknown", <>
 				<header className="flex pl-16 mb-4 justify-between py-1 items-center">
 					<h1 className={commonStyles.management.title}>Kiosk Management Panel</h1>
-		
+
+					{/* Displays each of the tabs as buttons which set the current tab index */}
+					{/* Uses Framer Motion AnimatePresence to smoothly animate the highlight
+						between each tab label */}
 					<AnimatePresence>
 						<div className={styles.tabs.container}>
 							{tabs.map((tab, i) => <button
@@ -70,19 +75,28 @@ export default function Manage() {
 								onClick={() => setTabIndex(i)}
 								className={styles.tabs.button}>
 									{
+										// Moves the highlight over the tab label where
+										// the current tabIndex == the index of the tab
 										tabIndex === i &&
 										<motion.div
-										layoutId="active-tab"
-										transition={{ ease: "backOut" }}
-										className={styles.tabs.overlay}></motion.div>
+											layoutId="active-tab"
+											transition={{ ease: "backOut" }}
+											className={styles.tabs.overlay}>
+										</motion.div>
 									}
 									<span className={commonStyles.management.subtitle}>{tab.name}</span>
 							</button>)}
 						</div>
 					</AnimatePresence>
-		
+					
+					{/* Show mobile menu button, only on small screens (640px) */}
+					{/* Toggles mobile menu open/closed on click */}
 					<MenuButton onClick={() => setMobileMenuOpen(o => !o)} className="sm:hidden z-50" size={24} />
-		
+
+					{/* Displays the mobile menu */}
+					{/* Uses conditional rendering based on mobileMenuOpen state */}
+					{/* Uses AnimatePresence to wait until exit animation (fade out)
+						finishes playing before removing from the DOM */}
 					<AnimatePresence>
 						{
 							mobileMenuOpen &&
@@ -103,19 +117,19 @@ export default function Manage() {
 							</motion.div>
 						}
 					</AnimatePresence>
-		
 				</header>
 				
+				{/* Show the currently selected tab component */}
 				<div className="relative w-full h-full">
 					<AnimatePresence mode="popLayout">
 						<ManagementTab key={tabs[tabIndex].name} {...tabs[tabIndex]} />
 					</AnimatePresence>
 				</div>
-		
+
+				{/* Back to main screen button */}
 				<Link href="/" className={commonStyles.management.backButton}>&lsaquo;</Link>
 				<DarkButton />
-			</>
-			: <div className={commonStyles.loadingSpinner}></div>
+			</> )
 		}
 	</div>
 }

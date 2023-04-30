@@ -1,7 +1,7 @@
 import DarkButton from "@/components/DarkButton";
 import { tw } from "@/utility/tailwindUtil";
-import { useEffect, useState } from "react";
-import { AuthRequest, adminAccountExists } from "./api/auth";
+import { useState } from "react";
+import { AuthRequest } from "./api/auth";
 import { useRouter } from "next/router";
 import commonStyles from "@/styles/common";
 import useAuth from "@/hooks/useAuth";
@@ -49,18 +49,23 @@ const styles = {
 }
 
 export default function Login() {
+	// Stateful variables to temporarily store entered credentials
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [incorrect, setIncorrect] = useState(false);
 	
 	const router = useRouter();
 
+	// If user enters the page while already logged in,
+	// reroute to main page.
 	useAuth((valid: boolean, hasAdminAccount: boolean) => {
 		if(valid || !hasAdminAccount) {
 			router.push("/");
 		}
 	});
 
+	// Sends server request to log in
+	// with the entered credentials
 	async function submit() {
 		const request: AuthRequest = {
 			intent: "login",
@@ -77,29 +82,47 @@ export default function Login() {
 		});
 
 		if(res.status === 200) {
+			// Credentials are accepted
+			// Go to redirect route from url, if exists
 			const redirect = new URLSearchParams(window.location.search).get("redirect") ?? "";
 			router.push(redirect);
 		} else {
+			// Credentials are rejected
 			setIncorrect(true);
 		}
 	}
 
 	return <div className={styles.outerContainer}>
+
 		<form onSubmit={e => { e.preventDefault(); submit(); }} method="post" className={styles.innerContainer}>
+
 			<h1 className={styles.title}>Administration Login</h1>
-				<input onChange={e => { setUsername(e.currentTarget.value); setIncorrect(false); }} className={commonStyles.management.inputBox} placeholder="Username" type="text" />
-				<input onChange={e => { setPassword(e.currentTarget.value); setIncorrect(false); }} className={commonStyles.management.inputBox} placeholder="Password" type="password" />
+
+				<input
+					onChange={e => { setUsername(e.currentTarget.value); setIncorrect(false); }}
+					className={commonStyles.management.inputBox}
+					placeholder="Username"
+					type="text" />
+
+				<input
+					onChange={e => { setPassword(e.currentTarget.value); setIncorrect(false); }}
+					className={commonStyles.management.inputBox}
+					placeholder="Password"
+					type="password" />
 
 				<button
 					onClick={submit}
 					disabled={username.length * password.length === 0}
 					className={commonStyles.management.button}>
-						Submit
+					Submit
 				</button>
 			{
+				// Display error text if invalid credentials are entered
 				incorrect && <p className={styles.errorText}>Incorrect username or password. Try again.</p>
 			}
 		</form>
+
+		{/* Back button to main screen */}
 		<Link href="/" className={commonStyles.management.backButton}>&lsaquo;</Link>
 		<DarkButton />
 	</div>

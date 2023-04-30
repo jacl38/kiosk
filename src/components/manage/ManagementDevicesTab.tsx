@@ -5,6 +5,7 @@ import { tw } from "@/utility/tailwindUtil"
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import TextConfirmField from "./TextConfirmField";
+import withLoading from "../higherOrder/withLoading";
 
 const styles = {
 	outerContainer: tw(
@@ -173,40 +174,40 @@ export default function ManagementDevicesTab() {
 		className={styles.outerContainer}>
 		<div className={styles.listContainer}>
 			{
-				foundDevices === "unknown"
-				? <div className={commonStyles.loadingSpinner}></div>
-				: devices?.length > 0
-					? <>
-						{devices.map((device, i) => <button key={i}
-							onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
-							className={styles.listItem(selectedDeviceID === device.id)}>
-							<div className="flex justify-between space-x-2">
-								<div className="flex shrink truncate">
-									<span className="font-bold truncate">{device.name}</span>
-									<span className="font-normal italic ml-1">({device.type})</span>
+				withLoading(foundDevices === "unknown",
+					devices.length > 0
+						? <>
+							{devices.map((device, i) => <button key={i}
+								onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
+								className={styles.listItem(selectedDeviceID === device.id)}>
+								<div className="flex justify-between space-x-2">
+									<div className="flex shrink truncate">
+										<span className="font-bold truncate">{device.name}</span>
+										<span className="font-normal italic ml-1">({device.type})</span>
+									</div>
+									<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
 								</div>
-								<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
-							</div>
-							<p className="opacity-60">Paired: {formatPairDate(device.pairDate)}</p>
-							<span className={styles.arrow}>&rsaquo;</span>
-						</button>)}
-					</>
-					: <div className={styles.listItem(false)}>
-						<p className={commonStyles.management.title}>
-							{
-								foundDevices === "error"
-									? <>Authorization has expired</>
-									: <>No devices found</>
-							}
-						</p>
-						<p className={commonStyles.management.subtitle}>
-							{
-								foundDevices === "error"
-									? <>Reload the page and log in</>
-									: <>Enable pairing mode, then navigate to <a className="underline" href={window.location.origin}>{window.location.origin}</a> on the device</>
-							}
-						</p>
-					</div>
+								<p className="opacity-60">Paired: {formatPairDate(device.pairDate)}</p>
+								<span className={styles.arrow}>&rsaquo;</span>
+							</button>)}
+						</>
+						: <div className={styles.listItem(false)}>
+							<p className={commonStyles.management.title}>
+								{
+									foundDevices === "error"
+										? <>Authorization has expired</>
+										: <>No devices found</>
+								}
+							</p>
+							<p className={commonStyles.management.subtitle}>
+								{
+									foundDevices === "error"
+										? <>Reload the page and log in</>
+										: <>Enable pairing mode, then navigate to <a className="underline" href={window.location.origin}>{window.location.origin}</a> on the device</>
+								}
+							</p>
+						</div>
+				)
 			}
 		</div>
 
