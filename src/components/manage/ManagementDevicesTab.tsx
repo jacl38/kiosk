@@ -1,4 +1,3 @@
-import { hash } from "@/pages/api/auth";
 import { DeviceInfo, PairRequest } from "@/pages/api/device"
 import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil"
@@ -83,7 +82,7 @@ export default function ManagementDevicesTab() {
 			deviceID: selectedDeviceID
 		}
 
-		const response = await fetch("/api/device", {
+		await fetch("/api/device", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",
@@ -91,7 +90,6 @@ export default function ManagementDevicesTab() {
 			},
 			body: JSON.stringify(request)
 		});
-		console.log(await response.json());
 	}
 
 	async function renameSelectedDevice(newName: string) {
@@ -103,7 +101,7 @@ export default function ManagementDevicesTab() {
 			newName
 		}
 
-		const response = await fetch("/api/device", {
+		await fetch("/api/device", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",
@@ -116,7 +114,7 @@ export default function ManagementDevicesTab() {
 	async function signalPair() {
 		const request: PairRequest = { intent: "open" }
 
-		const response = await fetch("/api/device", {
+		await fetch("/api/device", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",

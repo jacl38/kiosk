@@ -1,4 +1,3 @@
-
 /** Find the lowest missing value from the source array.
  * 	e.g. [1, 2, 3, 5, 7, 12] -> 4. */
 export function lowestMissingValue(values: number[]): number {

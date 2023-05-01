@@ -1,3 +1,8 @@
+export const SettingsCollectionName = "MenuSettings";
+export type Settings = {
+	taxRate: number
+}
+
 export const CategoryCollectionName = "MenuCategory";
 export type Category = {
 	name: string,
