@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { AuthFormat, hash, query } from "./auth";
 import getCollection from "./db";
 import { getCookie, setCookie } from "cookies-next";
+import { lowestMissingValue } from "@/utility/mathUtil";
 
 export type DeviceType = "kiosk" | "orders" | "manage";
 export type DeviceInfo = {
@@ -98,16 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						// Find the lowest unused device ID from the list of authorized devices
 						// e.g. if devices with ids [1, 2, 3, 6, 7, 12] are registered,
 						// the lowest unused ID is 4
-						const ids = authorizedDevices.map(d => d.id).sort((a, b) => a - b);
-
-						let lowestUnusedDeviceID = 1;
-						const highestUsedDeviceID = ids[ids.length - 1] ?? 1;
-						for(let i = 1; i <= highestUsedDeviceID + 1; i++) {
-							if(!ids.includes(i)) {
-								lowestUnusedDeviceID = i;
-								break;
-							}
-						}
+						const lowestUnusedDeviceID = lowestMissingValue(authorizedDevices.map(d => d.id));
 
 						// Create a new token and issue it to the client
 						const newToken = hash(`${new Date()}${lowestUnusedDeviceID}`);
