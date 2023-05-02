@@ -10,7 +10,7 @@ const commonStyles = {
 			`overflow-scroll`,
 			`text-stone-700 dark:text-stone-300`,
 			`transition-colors`,
-			`overflow-hidden`
+			`overflow-hidden`,
 		),
 		inputBox: tw(
 			`px-2 py-1`,
@@ -73,7 +73,54 @@ const commonStyles = {
 			`after:flex after:items-center after:justify-center`,
 			`transition-all`,
 			`appearance-none`,
-		)
+		),
+		menu: {
+			outerContainer: tw(
+				`flex max-md:flex-col`,
+				`h-full`,
+				`md:space-x-4 max-md:space-y-4`,
+				`relative`,
+			),
+			list: {
+				container: tw(
+					`w-full`,
+					`space-y-4`,
+				),
+				item: (selected: boolean) => tw(
+					`p-4`,
+					`rounded-xl`,
+					`w-full`,
+					`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-20`,
+					selected ? `bg-opacity-30 dark:bg-opacity-30` : `hover:bg-opacity-20 dark:hover:bg-opacity-25`,
+					`border-2 border-stone-400 dark:border-gray-500`,
+					`relative group`,
+					`text-left`,
+					`cursor-pointer`,
+					`transition-colors`
+				),
+				arrow: tw(
+					`max-md:hidden`,
+					`text-4xl font-semibold`,
+					`absolute`,
+					`right-6 group-hover:right-4`,
+					`bottom-2`,
+					`select-none`,
+					`transition-all`,
+					`after:content-['›']`
+				),
+			},
+			sideContainer: tw(
+				`w-full`,
+				`sticky top-0 self-start`,
+				`rounded-2xl`,
+				`h-96`,
+				`p-4`,
+				`flex flex-col items-center space-y-4`,
+				`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-20`,
+				`border-2 border-stone-400 dark:border-gray-500`,
+				`transition-all`
+			)
+		}
 	},
 	loadingSpinner: tw(
 		`m-auto`,

@@ -1,4 +1,5 @@
 import { DeviceType, PairRequest } from "@/pages/api/device";
+import postRequest from "@/utility/netUtil";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -16,14 +17,7 @@ export default function usePair(type: DeviceType, then?: (paired: boolean) => vo
 				deviceType: type
 			}
 
-			const response = await fetch("/api/device", {
-				method: "POST",
-				headers: {
-					"Accept": "application/json",
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(request)
-			}).then(async response => {
+			await postRequest("device", request, async response => {
 				if(response.status === 200) {
 					const id: number = (await response.json()).id;
 					setID(id);
@@ -31,7 +25,7 @@ export default function usePair(type: DeviceType, then?: (paired: boolean) => vo
 				} else {
 					setPaired("unpaired");
 				}
-			}, reason => console.error(reason));
+			});
 		})();
 	}, []);
 

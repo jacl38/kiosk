@@ -5,58 +5,15 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import TextConfirmField from "./TextConfirmField";
 import withLoading from "../higherOrder/withLoading";
+import postRequest from "@/utility/netUtil";
 
 const styles = {
-	outerContainer: tw(
-		`flex max-md:flex-col`,
-		`h-full`,
-		`md:space-x-4 max-md:space-y-4`,
-		`relative`,
-	),
-	listContainer: tw(
-		`w-full`,
-		`space-y-4`,
-	),
-	listItem: (selected: boolean) => tw(
-		`p-4`,
-		`rounded-xl`,
-		`w-full`,
-		`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-20`,
-		selected ? `bg-opacity-30 dark:bg-opacity-30` : `hover:bg-opacity-20 dark:hover:bg-opacity-25`,
-		`border-2 border-stone-400 dark:border-gray-500`,
-		`relative group`,
-		`text-left`,
-		`cursor-pointer`,
+	pairingContainer: tw(
+		`w-full flex items-center justify-center`,
+		`pb-2 mb-4 space-x-2`,
+		`border-b-2 border-stone-400 dark:border-gray-500`,
 		`transition-colors`
-	),
-	arrow: tw(
-		`max-md:hidden`,
-		`text-4xl font-semibold`,
-		`absolute`,
-		`right-6 group-hover:right-4`,
-		`bottom-2`,
-		`select-none`,
-		`transition-all`
-	),
-	deviceDetails: {
-		container: tw(
-			`w-full`,
-			`sticky top-0 self-start`,
-			`rounded-2xl`,
-			`h-96`,
-			`p-4`,
-			`flex flex-col items-center space-y-4`,
-			`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-20`,
-			`border-2 border-stone-400 dark:border-gray-500`,
-			`transition-all`
-		),
-		pairingContainer: tw(
-			`w-full flex items-center justify-center`,
-			`pb-2 mb-4 space-x-2`,
-			`border-b-2 border-stone-400 dark:border-gray-500`,
-			`transition-colors`
-		)
-	}
+	)
 }
 
 function formatPairDate(pairDate: number) {
@@ -81,15 +38,8 @@ export default function ManagementDevicesTab() {
 			intent: "delete",
 			deviceID: selectedDeviceID
 		}
-
-		await fetch("/api/device", {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(request)
-		});
+		
+		await postRequest("device", request);
 	}
 
 	async function renameSelectedDevice(newName: string) {
@@ -101,27 +51,13 @@ export default function ManagementDevicesTab() {
 			newName
 		}
 
-		await fetch("/api/device", {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(request)
-		});
+		await postRequest("device", request);
 	}
 
 	async function signalPair() {
 		const request: PairRequest = { intent: "open" }
 
-		await fetch("/api/device", {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(request)
-		});
+		await postRequest("device", request);
 	}
 
 	const [pairing, setPairing] = useState(false);
@@ -148,14 +84,7 @@ export default function ManagementDevicesTab() {
 				intent: "query"
 			}
 
-			await fetch("/api/device", {
-				method: "POST",
-				headers: {
-					"Accept": "application/json",
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(request)
-			}).then(async response => {
+			await postRequest("device", request, async response => {
 				if(response.status === 200) {
 					const body = await response.json() as { devices: DeviceInfo[] };
 					setDevices(body.devices);
@@ -163,21 +92,21 @@ export default function ManagementDevicesTab() {
 				} else {
 					setFoundDevices("error");
 				}
-			}, reason => console.error(reason));
+			});
 		})();
 	});
 
 	return <div
 		onClick={() => selectDevice()}
-		className={styles.outerContainer}>
-		<div className={styles.listContainer}>
+		className={commonStyles.management.menu.outerContainer}>
+		<div className={commonStyles.management.menu.list.container}>
 			{
 				withLoading(foundDevices === "unknown",
 					devices.length > 0
 						? <>
 							{devices.map((device, i) => <button key={i}
 								onClick={e => { e.stopPropagation(); selectDevice(device.id); }}
-								className={styles.listItem(selectedDeviceID === device.id)}>
+								className={commonStyles.management.menu.list.item(selectedDeviceID === device.id)}>
 								<div className="flex justify-between space-x-2">
 									<div className="flex shrink truncate">
 										<span className="font-bold truncate">{device.name}</span>
@@ -186,10 +115,10 @@ export default function ManagementDevicesTab() {
 									<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
 								</div>
 								<p className="opacity-60">Paired: {formatPairDate(device.pairDate)}</p>
-								<span className={styles.arrow}>&rsaquo;</span>
+								<span className={commonStyles.management.menu.list.arrow}></span>
 							</button>)}
 						</>
-						: <div className={styles.listItem(false)}>
+						: <div className={commonStyles.management.menu.list.item(false)}>
 							<p className={commonStyles.management.title}>
 								{
 									foundDevices === "error"
@@ -209,8 +138,8 @@ export default function ManagementDevicesTab() {
 			}
 		</div>
 
-		<div className={styles.deviceDetails.container} onClick={e => e.stopPropagation()}>
-			<span className={styles.deviceDetails.pairingContainer}>
+		<div className={commonStyles.management.menu.sideContainer} onClick={e => e.stopPropagation()}>
+			<span className={styles.pairingContainer}>
 				<label className={commonStyles.management.subtitle} htmlFor="pairing-checkbox">Enable pairing: </label>
 				<input
 					type="checkbox"
@@ -222,9 +151,8 @@ export default function ManagementDevicesTab() {
 				selectedDevice !== undefined
 				? <>
 					<div className="text-center">
-						{/* <input id="rename-device" className={tw(commonStyles.management.inputBox, "text-center")} type="text" value={selectedDevice?.name} /> */}
-						{/* <button className={commonStyles.management.button + " -mr-12 ml-2"}>&rsaquo;</button> */}
 						<TextConfirmField
+							label="Device name"
 							inputProps={{ type: "text", placeholder: selectedDevice.name }}
 							onSubmit={renameSelectedDevice}
 						/>

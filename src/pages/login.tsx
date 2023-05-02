@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import commonStyles from "@/styles/common";
 import useAuth from "@/hooks/useAuth";
 import Link from "next/link";
+import postRequest from "@/utility/netUtil";
 
 const styles = {
 	outerContainer: tw(
@@ -72,24 +73,17 @@ export default function Login() {
 			credentials: { username, password }
 		}
 
-		const res = await fetch("api/auth", {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(request)
+		await postRequest("auth", request, async response => {
+			if(response.status === 200) {
+				// Credentials are accepted
+				// Go to redirect route from url, if exists
+				const redirect = new URLSearchParams(window.location.search).get("redirect") ?? "";
+				router.push(redirect);
+			} else {
+				// Credentials are rejected
+				setIncorrect(true);
+			}
 		});
-
-		if(res.status === 200) {
-			// Credentials are accepted
-			// Go to redirect route from url, if exists
-			const redirect = new URLSearchParams(window.location.search).get("redirect") ?? "";
-			router.push(redirect);
-		} else {
-			// Credentials are rejected
-			setIncorrect(true);
-		}
 	}
 
 	return <div className={styles.outerContainer}>

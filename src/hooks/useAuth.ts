@@ -1,4 +1,5 @@
 import { AuthRequest } from "@/pages/api/auth";
+import postRequest from "@/utility/netUtil";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -28,15 +29,8 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 				intent: "query",
 				credentials: { username: "", password: "" }
 			}
-	
-			await fetch("api/auth", {
-				method: "POST",
-				headers: {
-					"Accept": "application/json",
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(request)
-			}).then(async response => {
+
+			await postRequest("auth", request, async response => {
 				const content = await response.json() as { hasAdminAccount: boolean, authenticated: boolean };
 
 				// Sets states based on server response
@@ -45,7 +39,7 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 
 				// Executes the supplied/default "then" function
 				defaultThen(content.authenticated, content.hasAdminAccount);
-			}, reason => console.error(reason));
+			});
 		})();
 	}, []);
 

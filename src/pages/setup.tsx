@@ -5,6 +5,7 @@ import Link from "next/link";
 import commonStyles from "@/styles/common";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import postRequest from "@/utility/netUtil";
 
 const styles = {
 	innerContainer: tw(
@@ -36,21 +37,11 @@ export default function Setup(props: { hasAdminAccount: boolean }) {
 			credentials: { username, password }
 		}
 
-		await fetch("api/auth", {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(request)
-		}).then(
-			response => {
-				if(response.status === 200) {
-					router.push("/");
-				}
-			},
-			rejected => alert("Something went wrong. Reload the page and try again.")
-		);
+		await postRequest("auth", request, async response => {
+			if(response.status === 200) {
+				router.push("/");
+			}
+		});
 	}
 
 	return <div className={commonStyles.management.outerContainer}>
