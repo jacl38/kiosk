@@ -6,11 +6,12 @@ import ManagementReportsTab from "@/components/manage/ManagementReportsTab";
 import ManagementTab, { ManagementTabProps } from "@/components/manage/ManagementTab";
 import MenuButton from "@/components/manage/MenuButton";
 import useAuth from "@/hooks/useAuth";
+import useUnsavedChanges, { UnsavedContext } from "@/hooks/useUnsavedChanges";
 import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 
 // Sets up list of components to render as tabs
 const tabs: ManagementTabProps[] = [
@@ -56,8 +57,16 @@ const styles = {
 export default function Manage() {
 	const [tabIndex, setTabIndex] = useState(0);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const { unsaved, setUnsaved, manuallyCheck: checkUnsaved } = useUnsavedChanges();
 
 	const { authenticated } = useAuth();
+
+	function tryChangeTab(index: number) {
+		if(!unsaved || checkUnsaved()) {
+			setUnsaved(false);
+			setTabIndex(index);
+		}
+	}
 
 	return <div className={tw(commonStyles.management.outerContainer, "p-8")}>
 		{
@@ -66,28 +75,25 @@ export default function Manage() {
 					<h1 className={commonStyles.management.title}>Kiosk Management Panel</h1>
 
 					{/* Displays each of the tabs as buttons which set the current tab index */}
-					{/* Uses Framer Motion AnimatePresence to smoothly animate the highlight
-						between each tab label */}
-					<AnimatePresence>
-						<div className={styles.tabs.container}>
-							{tabs.map((tab, i) => <button
-								key={tab.name}
-								onClick={() => setTabIndex(i)}
-								className={styles.tabs.button}>
-									{
-										// Moves the highlight over the tab label where
-										// the current tabIndex == the index of the tab
-										tabIndex === i &&
-										<motion.div
-											layoutId="active-tab"
-											transition={{ ease: "backOut" }}
-											className={styles.tabs.overlay}>
-										</motion.div>
-									}
-									<span className={commonStyles.management.subtitle}>{tab.name}</span>
-							</button>)}
-						</div>
-					</AnimatePresence>
+					{/* Uses Framer Motion to smoothly animate the highlight between each tab label */}
+					<div className={styles.tabs.container}>
+						{tabs.map((tab, i) => <button
+							key={tab.name}
+							onClick={() => tryChangeTab(i)}
+							className={styles.tabs.button}>
+								{
+									// Moves the highlight over the tab label where
+									// the current tabIndex == the index of the tab
+									tabIndex === i &&
+									<motion.div
+										layoutId="active-tab"
+										transition={{ ease: "backOut" }}
+										className={styles.tabs.overlay}>
+									</motion.div>
+								}
+								<span className={commonStyles.management.subtitle}>{tab.name}</span>
+						</button>)}
+					</div>
 					
 					{/* Show mobile menu button, only on small screens (640px) */}
 					{/* Toggles mobile menu open/closed on click */}
@@ -109,7 +115,7 @@ export default function Manage() {
 								className={styles.mobileMenu.container}>
 								{tabs.map((tab, i) => <button
 									key={tab.name}
-									onClick={() => setTabIndex(i)}
+									onClick={() => tryChangeTab(i)}
 									className={styles.mobileMenu.button}>
 										{tab.name}
 									</button>
@@ -118,12 +124,16 @@ export default function Manage() {
 						}
 					</AnimatePresence>
 				</header>
+
+				{unsaved ? "unsaved" : "no unsaved"}
 				
 				{/* Show the currently selected tab component */}
 				<div className="relative w-full h-full">
-					<AnimatePresence mode="popLayout">
-						<ManagementTab key={tabs[tabIndex].name} {...tabs[tabIndex]} />
-					</AnimatePresence>
+					<UnsavedContext.Provider value={{ unsaved, setUnsaved }}>
+						<AnimatePresence mode="popLayout">
+							<ManagementTab key={tabs[tabIndex].name} {...tabs[tabIndex]} />
+						</AnimatePresence>
+					</UnsavedContext.Provider>
 				</div>
 
 				{/* Back to main screen button */}
