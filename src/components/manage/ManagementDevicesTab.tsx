@@ -150,17 +150,16 @@ export default function ManagementDevicesTab() {
 			{
 				selectedDevice !== undefined
 				? <>
-					<div className="text-center">
+					<div className="flex max-sm:flex-col max-sm:space-y-2 sm:space-x-2">
 						<TextConfirmField
 							label="Device name"
 							inputProps={{ type: "text", placeholder: selectedDevice.name }}
 							onSubmit={renameSelectedDevice}
 						/>
-						<p>ID: {selectedDevice?.id}</p>
-						<p>Paired on {formatPairDate(selectedDevice.pairDate)}</p>
+						<button onClick={deleteSelectedDevice} className={commonStyles.management.button}>Remove Device</button>
 					</div>
-					<button onClick={deleteSelectedDevice} className={commonStyles.management.button}>Remove Device</button>
-				</> : <h2 className={commonStyles.management.title}>Select a device from the list</h2>
+					<p className="max-sm:text-center">ID: {selectedDevice.id} &mdash; Paired on {formatPairDate(selectedDevice.pairDate)}</p>
+				</> : <h2 className={tw(commonStyles.management.title, "text-center")}>Select a device from the list</h2>
 			}
 		</div>
 	</div>
