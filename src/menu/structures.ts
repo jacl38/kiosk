@@ -5,12 +5,14 @@ export type Settings = {
 
 export const CategoryCollectionName = "MenuCategory";
 export type Category = {
+	type: "Category",
 	name: string,
 	description: string
 }
 
 export const ItemCollectionName = "MenuItem";
 export type Item = {
+	type: "Item",
 	name: string,
 	description: string,
 	categoryIDs: number[],
@@ -20,6 +22,7 @@ export type Item = {
 
 export const AddonCollectionName = "MenuAddon";
 export type Addon = {
+	type: "Addon",
 	name: string,
 	price: string
 }
@@ -35,5 +38,6 @@ export type Order = {
 	parts: OrderPart[],
 	notes: string,
 	name: string,
-	phone: string
+	phone: string,
+	timestamp: number
 }
