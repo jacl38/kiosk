@@ -1,8 +1,10 @@
-import Index from ".";
-
+import { ReactElement } from "react"
+import Index from "."
 
 export default function Reports() {
-	return <Index>
-		<p>reports outlet</p>
-	</Index>
+	return <p>Reports tab</p>
+}
+
+Reports.getLayout = (page: ReactElement) => {
+	return <Index>{page}</Index>
 }
