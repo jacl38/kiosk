@@ -8,10 +8,12 @@ import AddonEdit from "./menu/AddonEdit"
 
 import { useContext, useEffect, useRef, useState } from "react"
 import TextConfirmField from "./TextConfirmField"
-import { UnsavedContext } from "@/hooks/useUnsavedChanges"
+import useUnsavedChanges, { UnsavedContext } from "@/hooks/useUnsavedChanges"
 import { Menu, getMenu } from "@/menu/menuUtil"
 import useMenu from "@/hooks/useMenu"
 import withLoading from "../higherOrder/withLoading"
+import { ObjectId } from "mongodb"
+import { Addon, Category, Item } from "@/menu/structures"
 
 const styles = {
 	tab: {
@@ -36,22 +38,48 @@ const menuTabs = [
 
 export default function ManagementMenuTab() {
 	const [tabIndex, setTabIndex] = useState(0);
-	const { unsaved, setUnsaved } = useContext(UnsavedContext);
+	const { unsaved: pageUnsaved, setUnsaved: setPageUnsaved } = useContext(UnsavedContext);
+	const { unsaved: objectUnsaved, setUnsaved: setObjectUnsaved } = useUnsavedChanges();
+
+	const [selectedObjectId, setSelectedObjectId] = useState<ObjectId | undefined>();
 
 	const menu = useMenu(true);
+	const key = menuTabs[tabIndex].key as "categories" | "items" | "addons";
 
 	function getRenderList() {
-		const key = menuTabs[tabIndex].key as "categories" | "items" | "addons";
 		return menu.menu?.[key];
 	}
 
-	return <div className={commonStyles.management.menu.outerContainer}>
+	function getSelectedObject(): Category | Item | Addon | undefined {
+		return menu.menu?.[key].map(o => o as any).find(o => o._id === selectedObjectId);
+	}
+
+	function selectObject(object: Category | Item | Addon | undefined) {
+		if(getSelectedObject() === undefined) {
+			setSelectedObjectId(object?._id);
+			return;
+		}
+
+		if(objectUnsaved) {
+			if(confirm(`There are unsaved changes to this ${getSelectedObject()?.type}. If you leave now, these changes will be lost.`)) {
+				setSelectedObjectId(object?._id);
+				setObjectUnsaved(false);
+				setPageUnsaved?.(false);
+			}
+		} else {
+			setSelectedObjectId(object?._id);
+		}
+	}
+
+	return <div
+		onClick={e => selectObject(undefined)}
+		className={commonStyles.management.menu.outerContainer}>
 		<div className={commonStyles.management.menu.list.container}>
 			<div className="flex lg:space-x-2 max-lg:flex-col-reverse">
 				<div className={styles.tab.container}>
 					{menuTabs.map((tab, i) => <button
 						key={tab.title}
-						onClick={() => setTabIndex(i)}
+						onClick={e => { e.preventDefault(); setTabIndex(i); }}
 						className="relative px-4 py-2 w-full">
 							{
 								tabIndex === i &&
@@ -70,7 +98,7 @@ export default function ManagementMenuTab() {
 				<div className="min-w-[6rem] w-0 max-lg:w-full max-lg:mb-2">
 					{
 						withLoading(!menu.settingsLoaded,
-							<form onChange={e => setUnsaved?.(true)} onSubmit={e => e.preventDefault()} >
+							<form onChange={e => setPageUnsaved?.(true)} onSubmit={e => e.preventDefault()} >
 								<TextConfirmField inputProps={{
 									placeholder: `${menu.settings?.taxRate ?? 0}`
 								}}
@@ -86,6 +114,7 @@ export default function ManagementMenuTab() {
 					<div className="max-md:max-h-96 overflow-y-scroll space-y-2">
 						{getRenderList()?.map((object, i) => {
 							return <button
+								onClick={e => { e.stopPropagation(); selectObject(object) }}
 								key={i}
 								className={commonStyles.management.menu.list.item(false)}>
 								<div className="flex justify-between space-x-2">
@@ -105,8 +134,8 @@ export default function ManagementMenuTab() {
 			}
 		</div>
 
-		<div className={commonStyles.management.menu.sideContainer}>
-			
+		<div onClick={e => e.stopPropagation()} className={commonStyles.management.menu.sideContainer}>
+			{JSON.stringify(getSelectedObject())}
 		</div>
 	</div>
 }

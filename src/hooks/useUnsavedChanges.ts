@@ -20,13 +20,25 @@ export default function useUnsavedChanges() {
 				throw "Cancel page change";
 			}
 		}
-		if(unsaved) {
-			Router.events.on("routeChangeStart", onRouteChange);
-		} else {
-			Router.events.off("routeChangeStart", onRouteChange);
+
+		function beforeUnload(e: Event) {
+			if(!manuallyCheck()) {
+				e.preventDefault();
+			}
 		}
 
-		return () => Router.events.off("routeChangeStart", onRouteChange);
+		if(unsaved) {
+			Router.events.on("routeChangeStart", onRouteChange);
+			window.addEventListener("beforeunload", beforeUnload);
+		} else {
+			Router.events.off("routeChangeStart", onRouteChange);
+			window.removeEventListener("beforeunload", beforeUnload);
+		}
+
+		return () => {
+			Router.events.off("routeChangeStart", onRouteChange);
+			window.removeEventListener("beforeunload", beforeUnload);
+		}
 	}, [unsaved]);
 
 	return { unsaved, setUnsaved, manuallyCheck };
