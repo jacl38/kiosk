@@ -26,6 +26,7 @@ const commonStyles = {
 			`enabled:hover:bg-stone-400 enabled:dark:hover:bg-gray-700`,
 			`border-2 border-stone-400 dark:border-gray-700`,
 			`rounded-full`,
+			`shrink-0`,
 			`disabled:opacity-50 disabled:cursor-not-allowed`,
 			`transition-all`,
 		),
@@ -83,8 +84,9 @@ const commonStyles = {
 			),
 			list: {
 				container: tw(
-					`w-full`,
 					`space-y-4`,
+					`flex flex-col`,
+					`w-full md:max-w-[50%]`,
 				),
 				item: (selected: boolean) => tw(
 					`p-4`,
@@ -110,12 +112,11 @@ const commonStyles = {
 				),
 			},
 			sideContainer: tw(
-				`w-full`,
 				`sticky top-0 self-start`,
 				`rounded-2xl`,
-				`h-96`,
+				`grow w-full h-full`,
 				`p-4`,
-				`flex flex-col items-center space-y-4`,
+				`flex flex-col space-y-4`,
 				`bg-stone-700 dark:bg-gray-300 bg-opacity-10 dark:bg-opacity-20`,
 				`border-2 border-stone-400 dark:border-gray-500`,
 				`transition-all`
@@ -123,12 +124,15 @@ const commonStyles = {
 		}
 	},
 	loadingSpinner: tw(
-		`m-auto`,
-		`w-16 h-16`,
-		`rounded-full`,
-		`border-8 border-t-transparent`,
-		`border-stone-400 dark:border-gray-500 dark:border-t-transparent`,
-		`animate-spin`
+		`relative flex items-center justify-center`,
+		`w-full h-full`,
+		`after:absolute`,
+		`after:w-10 after:h-10`,
+		`after:aspect-square`,
+		`after:rounded-full`,
+		`after:border-8 after:border-t-transparent after:dark:border-t-transparent`,
+		`after:border-stone-400 after:dark:border-gray-500`,
+		`after:animate-spin`,
 	)
 }
 

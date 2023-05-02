@@ -114,7 +114,7 @@ export default function ManagementDevicesTab() {
 									</div>
 									<span className="opacity-60 w-16 shrink-0">ID: {device.id}</span>
 								</div>
-								<p className="opacity-60">Paired: {formatPairDate(device.pairDate)}</p>
+								<p className="opacity-60 truncate w-11/12">Paired: {formatPairDate(device.pairDate)}a swkejralk erjawlk rjalwekjrwalk</p>
 								<span className={commonStyles.management.menu.list.arrow}></span>
 							</button>)}
 						</>

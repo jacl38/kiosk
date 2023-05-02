@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { query } from "./auth";
 import { getAddons, getCategories, getItems, getMenu } from "@/menu/menuUtil";
-import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName } from "@/menu/structures";
+import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName, Settings, SettingsCollectionName } from "@/menu/structures";
 import { ObjectId } from "mongodb";
 import getCollection from "./db";
 
-export type MenuIntent = "get" | "add" | "remove" | "modify";
+export type MenuIntent = "get" | "add" | "remove" | "modify" | "getsettings" | "modifysettings";
 export type MenuRequest = {
 	intent: "get"
 } | {
@@ -19,6 +19,11 @@ export type MenuRequest = {
 	intent: "modify",
 	id: ObjectId,
 	modifiedObject: Category | Item | Addon
+} | {
+	intent: "getsettings"
+} | {
+	intent: "modifysettings",
+	modifiedSettings: Settings
 }
 
 function getCollectionByType(type: "Category" | "Item" | "Addon") {
@@ -73,6 +78,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 							res.status(200).send({ message: `Modified ${modified.modifiedCount} from ${request.modifiedObject.type}` });
 						} else {
 							res.status(500).send({ error: "An error ocurred. No object deleted." });
+						}
+					} else {
+						res.status(401).send({ error: "Unauthorized" });
+					}
+					return;
+				}
+				case "getsettings": {
+					if(authorized) {
+						const settingsCollection = await getCollection(SettingsCollectionName);
+						const settingsDocument = await settingsCollection.findOne({});
+						const settings = settingsDocument as unknown as Settings;
+						res.status(200).send({ settings });
+					} else {
+						res.status(401).send({ error: "Unauthorized" });
+					}
+					return;
+				}
+				case "modifysettings": {
+					if(authorized) {
+						const modified = await (await getCollection(SettingsCollectionName))
+							.updateOne({}, request.modifiedSettings);
+						if(modified.acknowledged) {
+							res.status(200).send({ message: "Modified settings" });
+						} else {
+							res.status(500).send({ error: "An error occurred. No settings changed." });
 						}
 					} else {
 						res.status(401).send({ error: "Unauthorized" });

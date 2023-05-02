@@ -1,23 +1,32 @@
 import { Menu } from "@/menu/menuUtil";
-import { Addon, Category, Item } from "@/menu/structures";
+import { Addon, Category, Item, Settings } from "@/menu/structures";
 import { MenuRequest } from "@/pages/api/menu";
 import postRequest from "@/utility/netUtil";
 import { ObjectId } from "mongodb";
 import { useEffect, useState } from "react";
 
-export default function useMenu() {
-	const [loaded, setLoaded] = useState(false);
-
+export default function useMenu(admin: boolean) {
 	const [menu, setMenu] = useState<Menu>();
+	const [menuLoaded, setMenuLoaded] = useState(false);
+
+	const [settings, setSettings] = useState<Settings>();
+	const [settingsLoaded, setSettingsLoaded] = useState(false);
 
 	useEffect(() => {
-		(async function () {
-			const request: MenuRequest = { intent: "get" }
-			
-			await postRequest("menu", request, async response => {
+		(async function () {			
+			await postRequest("menu", { intent: "get" }, async response => {
 				if(response.status === 200) {
-					setMenu(await response.json());
-					setLoaded(true);
+					const body = await response.json();
+					setMenu(body.menu);
+					setMenuLoaded(true);
+				}
+			});
+			
+			await postRequest("menu", { intent: "getsettings" }, async response => {
+				if(response.status === 200) {
+					const body = await response.json();
+					setSettings(body.settings);
+					setSettingsLoaded(true);
 				}
 			});
 		})();
@@ -47,5 +56,13 @@ export default function useMenu() {
 		});
 	}
 
-	return { menu, loaded, addObject, removeObject, modifyObject };
+	async function modifySettings(modifiedSettings: Settings) {
+		const request: MenuRequest = { intent: "modifysettings", modifiedSettings };
+
+		await postRequest("menu", request, async response => {
+			return response.status === 200;
+		});
+	}
+
+	return { menu, menuLoaded, settings, settingsLoaded, addObject, removeObject, modifyObject, modifySettings };
 }

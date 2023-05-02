@@ -17,7 +17,7 @@ export type Item = {
 	description: string,
 	categoryIDs: number[],
 	availableAddonIDs: number[],
-	basePrice: number
+	price: number
 }
 
 export const AddonCollectionName = "MenuAddon";
