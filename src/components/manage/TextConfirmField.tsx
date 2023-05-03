@@ -50,7 +50,7 @@ export default function TextConfirmField(props: TextConfirmFieldProps) {
 		props.onSubmit?.(inputRef.current?.value ?? "");
 	}
 
-	return <div className={styles.outerContainer} onSubmit={submit}>
+	return <div onKeyDown={e => { if(e.code === "Enter") submit() }} className={styles.outerContainer}>
 		<label htmlFor={`${props.key}-input`} className={styles.label}>{props.label}</label>
 		<input id={`${props.key}-input`} ref={inputRef} {...props.inputProps} className={styles.textInput} />
 		<span className="my-auto select-none font-semibold">{props.suffix}</span>
