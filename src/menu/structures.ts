@@ -1,5 +1,24 @@
 import { ObjectId } from "mongodb";
 
+interface IBuyable {
+	_id: ObjectId,
+	name: string,
+	price: number
+}
+
+export const ItemCollectionName = "MenuItem";
+export interface Item extends IBuyable {
+	type: "Item",
+	description: string,
+	categoryIDs: ObjectId[],
+	addons: { id: ObjectId, enabled: boolean }
+}
+
+export const AddonCollectionName = "MenuAddon";
+export interface Addon extends IBuyable {
+	type: "Addon"
+}
+
 export const SettingsCollectionName = "MenuSettings";
 export type Settings = {
 	taxRate: number
@@ -13,28 +32,9 @@ export type Category = {
 	description: string
 }
 
-export const ItemCollectionName = "MenuItem";
-export type Item = {
-	_id: ObjectId,
-	type: "Item",
-	name: string,
-	description: string,
-	categoryIDs: number[],
-	availableAddonIDs: number[],
-	price: number
-}
-
-export const AddonCollectionName = "MenuAddon";
-export type Addon = {
-	_id: ObjectId,
-	type: "Addon",
-	name: string,
-	price: string
-}
-
 export type OrderPart = {
-	itemID: number,
-	addonIDs: number[],
+	itemID: ObjectId,
+	addonIDs: ObjectId[],
 	notes: string
 }
 
