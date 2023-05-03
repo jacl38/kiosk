@@ -51,14 +51,16 @@ const commonStyles = {
 			`before:absolute before:-ml-6`
 		),
 		backButton: tw(
-			`absolute left-4 top-4`,
+			`absolute`,
+			`sm:left-4 sm:top-4`,
+			`max-sm:-top-1`,
 			`text-5xl`,
 			`flex items-center justify-center`,
 			`pb-3 pr-1`,
 			`w-16 h-16`,
 			`hover:bg-stone-300 dark:hover:bg-gray-700`,
 			`rounded-full`,
-			`transition-colors`
+			`transition-all`
 		),
 		checkbox: tw(
 			`w-5 h-5`,
@@ -94,8 +96,8 @@ const commonStyles = {
 					) : "max-lg:hidden",
 					``),
 				container: tw(
-					`lg:h-full`,
-					`overflow-y-scroll`,
+					`h-full`,
+					`overflow-y-hidden`,
 					`max-lg:max-h-[80%] max-lg:max-w-[calc(100vw-4rem)] max-lg:w-96`,
 					`max-lg:m-auto`,
 					`p-4`,

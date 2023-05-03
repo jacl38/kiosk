@@ -38,11 +38,11 @@ export default function ObjectEdit(props: { object: Category | Item | Addon | un
 	return <div className={styles.outerContainer}>
 		<div className={styles.topBar.container}>
 			<button className={commonStyles.management.button}>
-				<span className="text-rose-700">&#10754;</span> Delete {props.object?.type}
+				<span className="text-rose-700">&#10754;</span> Delete
 			</button>
 
 			<button className={commonStyles.management.button}>
-				<span className="text-green-700">&#10003;</span> Save changes
+				<span className="text-green-700">&#10003;</span> Save
 			</button>
 		</div>
 		<div className="h-full overflow-y-scroll">

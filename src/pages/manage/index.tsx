@@ -42,12 +42,12 @@ const styles = {
 		)
 	},
 	contentContainer: tw(
-		`absolute w-full h-full`,
+		`w-full h-full`,
 		`flex flex-col`,
-		`p-4`,
+		`max-sm:p-2 p-4`,
 		`bg-stone-300 dark:bg-gray-700`,
-		`rounded-2xl`,
-		`transition-colors`,
+		`max-sm:rounded-none sm:rounded-2xl`,
+		`transition-all`,
 	)
 }
 
@@ -71,11 +71,11 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 		setTabIndex(tabs.findIndex(t => t.route === route));
 	}, [router]);
 
-	return <div className={tw(commonStyles.management.outerContainer, "p-8")}>
+	return <div className={commonStyles.management.outerContainer}>
 		{
 			withLoading(authenticated === "unknown", <>
-				<header className="flex pl-16 mb-4 justify-between py-1 items-center">
-					<h1 className={commonStyles.management.title}>Kiosk Management Panel</h1>
+				<header className="flex h-20 justify-between py-4 sm:pt-8 sm:pb-4 px-6 items-center transition-all">
+					<h1 className={tw(commonStyles.management.title, "sm:pl-10 pl-8 transition-all")}>Kiosk Management Panel</h1>
 
 					{/* Displays each of the tabs as buttons which set the current tab index */}
 					{/* Uses Framer Motion to smoothly animate the highlight between each tab label */}
@@ -128,7 +128,7 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 					</AnimatePresence>
 				</header>
 				
-				<div className="relative w-full h-full">
+				<div className="h-[calc(100vh-5rem)] sm:px-4 sm:pb-4 transition-all">
 					<div className={styles.contentContainer}>
 						<AnimatePresence mode="popLayout">
 							<motion.div

@@ -11,12 +11,12 @@ import withLoading from "@/components/higherOrder/withLoading";
 const styles = {
 	innerContainer: tw(
 		`flex flex-col`,
-		`w-96`,
+		`max-sm:w-80 w-96`,
 		`space-y-4`,
 		`border rounded-xl`,
 		`border-stone-400 dark:border-gray-600`,
 		`m-auto p-4`,
-		`transition-colors`,
+		`transition-all`,
 	),
 	// Adds a green checkmark or red x depending on
 	// if the admin account is logged in

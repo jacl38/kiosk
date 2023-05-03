@@ -20,7 +20,7 @@ import ObjectEdit from "@/components/manage/menu/ObjectEdit";
 const styles = {
 	tab: {
 		container: tw(
-			`flex grow overflow-hidden`,
+			`flex grow overflow-x-scroll overflow-y-hidden`,
 		),
 		overlay: tw(
 			`absolute inset-0`,
@@ -92,12 +92,12 @@ export default function Menu() {
 
 	return <div className={commonStyles.management.splitScreen.container} key={stateChanged ? 1 : 0}>
 		<div className="flex flex-col h-full">
-			<div className="flex lg:space-x-2 max-lg:flex-col-reverse mb-1.5 lg:items-center">
+			<div className="flex sm:space-x-2 max-sm:flex-col-reverse mb-1.5 sm:items-center">
 				<div className={styles.tab.container}>
 					{tabs.map((tab, i) => <button
 						key={tab.label}
 						onClick={e => { e.preventDefault(); setTabIndex(i); }}
-						className="relative px-4 py-2 w-full">
+						className="relative px-1 py-1 w-full">
 							{
 								tabIndex === i &&
 								<motion.div
@@ -106,13 +106,13 @@ export default function Menu() {
 									className={styles.tab.overlay}>
 								</motion.div>
 							}
-							<span className={commonStyles.management.subtitle}>{tab.label}</span>
+							<span className={tw()}>{tab.label}</span>
 					</button>)}
 					<button className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
 						&#x1f705;
 					</button>
 				</div>
-				<div className="min-w-[6rem] w-0 max-lg:w-full max-lg:mb-2">
+				<div className="min-w-[6rem] w-0 max-sm:w-full max-sm:mb-2">
 					{
 						withLoading(!menu.settingsLoaded,
 							<form onChange={e => setPageUnsaved?.(true)} onSubmit={e => e.preventDefault()} >
