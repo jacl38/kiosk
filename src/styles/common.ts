@@ -75,6 +75,36 @@ const commonStyles = {
 			`transition-all`,
 			`appearance-none`,
 		),
+		splitScreen: {
+			container: tw(
+				`lg:grid h-full`,
+				`grid-cols-2 grid-rows-1`,
+				`gap-4`
+			),
+			details: {
+				backdrop: (open: boolean) => tw(
+					open ? tw(
+						`max-lg:fixed max-lg:inset-0`,
+						`max-lg:backdrop-blur-sm`,
+						`max-lg:bg-gray-700 max-lg:dark:bg-stone-800`,
+						`max-lg:bg-opacity-20 max-lg:dark:bg-opacity-20`,
+						`max-lg:flex`,
+						`transition-[backdrop-filter,opacity] duration-200`,
+					) : "max-lg:hidden",
+					``),
+				container: tw(
+					`lg:h-full`,
+					`max-lg:h-64 max-lg:max-w-[calc(100vw-4rem)] max-lg:w-96`,
+					`max-lg:m-auto`,
+					`p-4`,
+					`bg-stone-200 dark:bg-gray-600`,
+					`border-2 border-stone-300 dark:border-gray-500`,
+					`shadow-lg`,
+					`rounded-lg`,
+					`transition-colors`
+				)
+			}
+		},
 		menu: {
 			outerContainer: tw(
 				`flex max-md:flex-col`,

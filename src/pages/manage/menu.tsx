@@ -1,12 +1,13 @@
 import { ReactElement } from "react"
 import Index from "."
 import useUnsavedChanges from "@/hooks/useUnsavedChanges";
+import commonStyles from "@/styles/common";
 
 export default function Menu() {
 	const { unsaved, setUnsaved } = useUnsavedChanges();
 	
-	return <div>
-		<button onClick={e => setUnsaved(s => !s)}>unsaved: {unsaved ? "true" : "false"}</button>
+	return <div className={commonStyles.management.splitScreen.container}>
+		
 	</div>
 }
 
