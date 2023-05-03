@@ -13,11 +13,12 @@ const commonStyles = {
 			`overflow-hidden`,
 		),
 		inputBox: tw(
+			`w-full`,
 			`px-2 py-1`,
 			`bg-stone-100 dark:bg-gray-600`,
 			`border-2 border-stone-400 dark:border-gray-700`,
 			`transition-colors`,
-			`rounded-full`,
+			`rounded-2xl`,
 		),
 		button: tw(
 			`px-4 py-1`,
@@ -94,7 +95,8 @@ const commonStyles = {
 					``),
 				container: tw(
 					`lg:h-full`,
-					`max-lg:h-64 max-lg:max-w-[calc(100vw-4rem)] max-lg:w-96`,
+					`overflow-y-scroll`,
+					`max-lg:max-h-[80%] max-lg:max-w-[calc(100vw-4rem)] max-lg:w-96`,
 					`max-lg:m-auto`,
 					`p-4`,
 					`bg-stone-200 dark:bg-gray-600`,

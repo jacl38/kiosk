@@ -8,7 +8,8 @@ const styles = {
 		`overflow-hidden rounded-xl`,
 		`shadow-inner shadow-stone-400 dark:shadow-gray-800`,
 		`border-2 border-stone-400 dark:border-gray-600`,
-		`transition-colors`
+		`transition-all`,
+		`relative`
 	)
 }
 

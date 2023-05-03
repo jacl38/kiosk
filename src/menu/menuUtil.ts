@@ -19,19 +19,22 @@ export async function setSettings(settings: Settings) {
 
 // Helper functions to get menu structure collections from the database as arrays
 export async function getCategories() {
-	return await (await getCollection(CategoryCollectionName)).find({}).toArray() as unknown as Category[];
+	const allCategories = (await getCollection(CategoryCollectionName)).find({}).toArray();
+	return (await allCategories).map(c => ({...c, type: "Category"} as Category));
 }
 
 export async function getItems() {
-	return await (await getCollection(ItemCollectionName)).find({}).toArray() as unknown as Item[];
+	const allItems = (await getCollection(ItemCollectionName)).find({}).toArray();
+	return (await allItems).map(c => ({...c, type: "Item"} as Item));
 }
 
 export async function getAddons() {
-	return await (await getCollection(AddonCollectionName)).find({}).toArray() as unknown as Addon[];
+	const allAddons = (await getCollection(AddonCollectionName)).find({}).toArray();
+	return (await allAddons).map(c => ({...c, type: "Addon"} as Addon));
 }
 
 export async function getOrders() {
-	return await (await getCollection(OrderCollectionName)).find({}).toArray() as unknown as Addon[];
+	return await (await getCollection(OrderCollectionName)).find({}).toArray() as unknown as Order[];
 }
 
 export type Menu = {

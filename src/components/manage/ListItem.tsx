@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 const styles = {
 	container: (selected?: boolean) => tw(
 		`relative`,
-		`h-24 shrink-0`,
+		`shrink-0`,
 		`overflow-hidden`,
 		`rounded-xl`,
 		selected ? `bg-stone-200 dark:bg-gray-500` : `bg-stone-100 dark:bg-gray-600`,
@@ -19,8 +19,8 @@ const styles = {
 	)
 }
 
-export default function ListItem(props: { children?: ReactNode | ReactNode[], selected?: boolean, onClick?: () => void }) {
-	return <li className={styles.container(props.selected)}>
+export default function ListItem(props: { children?: ReactNode | ReactNode[], selected?: boolean, onClick?: () => void, height?: string | number }) {
+	return <li style={{ height: props.height ?? "5rem" }} className={styles.container(props.selected)}>
 		<button onClick={props.onClick} className={styles.button}></button>
 		{props.children}
 	</li>

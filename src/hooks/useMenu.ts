@@ -22,17 +22,20 @@ export default function useMenu(admin: boolean) {
 				}
 			});
 			
-			await postRequest("menu", { intent: "getsettings" }, async response => {
-				if(response.status === 200) {
-					const body = await response.json();
-					setSettings(body.settings);
-					setSettingsLoaded(true);
-				}
-			});
+			if(admin) {
+				await postRequest("menu", { intent: "getsettings" }, async response => {
+					if(response.status === 200) {
+						const body = await response.json();
+						setSettings(body.settings);
+						setSettingsLoaded(true);
+					}
+				});
+			}
 		})();
 	}, []);
 
 	async function addObject(object: Category | Item | Addon) {
+		if(!admin) return;
 		const request: MenuRequest = { intent: "add", object }
 		
 		await postRequest("menu", request, async response => {
@@ -41,6 +44,7 @@ export default function useMenu(admin: boolean) {
 	}
 
 	async function removeObject(type: "Category" | "Item" | "Addon", id: ObjectId) {
+		if(!admin) return;
 		const request: MenuRequest = { intent: "remove", type, id };
 
 		await postRequest("menu", request, async response => {
@@ -49,6 +53,7 @@ export default function useMenu(admin: boolean) {
 	}
 
 	async function modifyObject(id: ObjectId, modifiedObject: Category | Item | Addon) {
+		if(!admin) return;
 		const request: MenuRequest = { intent: "modify", id, modifiedObject };
 
 		await postRequest("menu", request, async response => {
@@ -57,6 +62,7 @@ export default function useMenu(admin: boolean) {
 	}
 
 	async function modifySettings(modifiedSettings: Settings) {
+		if(!admin) return;
 		const request: MenuRequest = { intent: "modifysettings", modifiedSettings };
 
 		await postRequest("menu", request, async response => {
@@ -64,5 +70,10 @@ export default function useMenu(admin: boolean) {
 		});
 	}
 
-	return { menu, menuLoaded, settings, settingsLoaded, addObject, removeObject, modifyObject, modifySettings };
+	return {
+		menu, menuLoaded,
+		settings, settingsLoaded,
+		addObject, removeObject, modifyObject,
+		modifySettings
+	};
 }
