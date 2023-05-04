@@ -49,11 +49,11 @@ export default function ItemEdit(props: Item) {
 		<div className="w-full h-full flex flex-col space-y-2">
 			<label className={commonStyles.management.subtitle}>Categories:</label>
 			<div className="h-full max-h-48 flex flex-col">
-				<MultiPicker key="category-options" options={[...Array(20)].map((_, i) => ({ id: Math.random(), label: `Test item ${i}` }))} />
+				<MultiPicker keyId="category-options" options={[...Array(20)].map((_, i) => ({ id: Math.random(), label: `Test item ${i}` }))} />
 			</div>
 			<label className={commonStyles.management.subtitle}>Addons:</label>
 			<div className="h-full max-h-48 flex flex-col">
-				<MultiPicker key="addon-options" options={[...Array(20)].map((_, i) => ({ id: Math.random(), label: `Test item ${i}` }))} />
+				<MultiPicker keyId="addon-options" options={[...Array(20)].map((_, i) => ({ id: Math.random(), label: `Test item ${i}` }))} />
 			</div>
 		</div>
 	</div>

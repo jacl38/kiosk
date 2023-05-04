@@ -31,7 +31,7 @@ type Option = {
 	label: string
 }
 
-export default function MultiPicker(props: { key: string, options: Option[] }) {
+export default function MultiPicker(props: { keyId: string, options: Option[] }) {
 
 	const [checked, setChecked] = useState<any[]>([]);
 
@@ -40,7 +40,7 @@ export default function MultiPicker(props: { key: string, options: Option[] }) {
 			props.options.map((option, i) => {
 				const isChecked = checked.includes(option.id);
 
-				return <li key={`${props.key}-${option.id}`} className={styles.listItem(isChecked)}>
+				return <li key={`${props.keyId}-${option.id}`} className={styles.listItem(isChecked)}>
 					<label className={styles.label(isChecked)} htmlFor={option.id}>{option.label}</label>
 					<input onChange={e => setChecked(c => {
 						if(e.target.checked) {

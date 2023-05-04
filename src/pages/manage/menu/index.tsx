@@ -43,12 +43,6 @@ const styles = {
 	)
 }
 
-// const tabs = [
-// 	{ type: "Category", label: "Categories" },
-// 	{ type: "Item", label: "Items" },
-// 	{ type: "Addon", label: "Addons" },
-// ];
-
 const tabs = {
 	category: { type: "Category", label: "Categories" },
 	item: { type: "Item", label: "Items" },
@@ -61,21 +55,22 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	const router = useRouter();
 	
 	const [stateChanged, setStateChanged] = useState(false);
-	const [selectedObjectId, setSelectedObjectId] = useState<ObjectId>();
-	const { unsaved: objectUnsaved, setUnsaved: setObjectUnsaved } = useUnsavedChanges();
+	const [selectedObjectId, setSelectedObjectId] = useState<string | undefined>();
 
 	const [selectedTab, setSelectedTab] = useState<keyof typeof tabs>();
 	const tab = tabs[selectedTab ?? "category"] ?? { label: "Object", type: "None" };
 
 	useEffect(() => {
 		const route = router.pathname.split("/").slice(1).pop() ?? ""
-		if(route === "menu") {
+		const objectType = router.query.object as keyof typeof tabs;
+		if(route === "menu" || !(objectType in tabs)) {
 			router.push("/manage/menu/category");
 		}
-		setSelectedTab(route as keyof typeof tabs);
 
-		setUnsaved(router.pathname.includes("#"));
-	}, [router.pathname]);
+		setSelectedTab(objectType);
+		setSelectedObjectId(router.query.id as string);
+		setUnsaved(router.asPath.includes("#"));
+	}, [router.asPath]);
 
 	const menu = useMenu(true);
 
@@ -143,7 +138,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 						getRenderList()?.map((object, i) => {
 							return <ListItem key={i}
 								onClick={() => router.push(`/manage/menu/${selectedTab}?id=${object._id.toString()}`)}
-								selected={selectedObjectId === object._id}>
+								selected={selectedObjectId === object._id.toString()}>
 								<div className="flex h-full p-3">
 									<div className="flex flex-col justify-between grow-0 w-[calc(100%-2rem)] truncate">
 										<p className="truncate font-bold">{object.name}</p>
