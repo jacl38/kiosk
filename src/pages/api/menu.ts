@@ -71,7 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "modify": {
-					console.log(request);
 					if(authorized) {
 						delete request.modifiedObject._id;
 

@@ -9,6 +9,7 @@ import { tw } from "@/utility/tailwindUtil";
 import AddonEdit from "@/components/manage/menu/AddonEdit";
 import CategoryEdit from "@/components/manage/menu/CategoryEdit";
 import ItemEdit from "@/components/manage/menu/ItemEdit";
+import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 
 const styles = {
 	outerContainer: tw(
@@ -36,6 +37,8 @@ export default function Object() {
 	const [modifiedData, setModifiedData] = useState<Category | Item | Addon>();
 	const { id } = router.query;
 	const menu = useMenu(true);
+
+	const { unsaved, setUnsaved } = useUnsavedChanges();
 
 	useEffect(() => {
 		if(!menu.menuLoaded || !objectType) return;
@@ -67,6 +70,7 @@ export default function Object() {
 	async function saveObject() {
 		if(!modifiedData || !modifiedData._id) return;
 		await menu.modifyObject(modifiedData._id, modifiedData);
+		setUnsaved(false);
 	}
 
 	return <div className={styles.outerContainer}>

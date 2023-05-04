@@ -1,12 +1,9 @@
 import { ReactElement, ReactNode, useContext, useEffect, useState } from "react"
 import Index from ".."
-import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import commonStyles from "@/styles/common";
 import List from "@/components/manage/List";
 import ListItem from "@/components/manage/ListItem";
-import { ObjectId } from "mongodb";
 import TextConfirmField from "@/components/manage/TextConfirmField";
-import { Addon, Category, Item } from "@/menu/structures";
 import { tw } from "@/utility/tailwindUtil";
 import { motion } from "framer-motion";
 import withLoading from "@/components/higherOrder/withLoading";
@@ -130,8 +127,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 					? withLoading(!menu.menuLoaded,
 						getRenderList()?.map((object, i) => {
 							return <ListItem key={i}
-								onClick={() => router.push(`/manage/menu/${selectedTab}?id=${object._id.toString()}`)}
-								selected={selectedObjectId === object._id.toString()}>
+								onClick={() => router.push(`/manage/menu/${selectedTab}?id=${object._id?.toString()}`)}
+								selected={selectedObjectId === object._id?.toString()}>
 								<div className="flex h-full p-3">
 									<div className="flex flex-col justify-between grow-0 w-[calc(100%-2rem)] truncate">
 										<p className="truncate font-bold">{object.name}</p>

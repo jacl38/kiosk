@@ -38,10 +38,7 @@ export default function MultiPicker(props: {
 	options: Option[],
 	onChange?: (checked: any[]) => void
 }) {
-	const [checked, setChecked] = useState<any[]>(() => {
-		console.log(props.options);
-		return props.options.filter(o => o.checked).map(o => o.id)
-	});
+	const [checked, setChecked] = useState<any[]>(() => props.options.filter(o => o.checked).map(o => o.id));
 
 	return <ul className={styles.outerContainer}>
 		{
