@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useContext, useEffect, useState } from "react"
+import { ReactElement, ReactNode, useEffect, useState } from "react"
 import Index from ".."
 import commonStyles from "@/styles/common";
 import List from "@/components/manage/List";
@@ -49,14 +49,13 @@ const tabs = {
 export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	const router = useRouter();
 	
-	const [stateChanged, setStateChanged] = useState(false);
 	const [selectedObjectId, setSelectedObjectId] = useState<string | undefined>();
 
 	const [selectedTab, setSelectedTab] = useState<keyof typeof tabs>();
 	const tab = tabs[selectedTab ?? "category"] ?? { label: "Object", type: "None" };
 
 	useEffect(() => {
-		const route = router.pathname.split("/").slice(1).pop() ?? ""
+		const route = router.pathname.split("/").slice(1).pop() ?? "";
 		const objectType = router.query.object as keyof typeof tabs;
 		if(route === "menu" || !(objectType in tabs)) {
 			router.push("/manage/menu/category");
@@ -64,15 +63,26 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 		setSelectedTab(objectType);
 		setSelectedObjectId(router.query.id as string);
-	}, [router.asPath]);
-
+	}, [router]);
+	
 	const menu = useMenu(true);
+
+	useEffect(() => {
+		function hashChange() {
+			if(window.location.hash === "") {
+				menu.reFetch();
+			}
+		}
+
+		window.addEventListener("hashchange", hashChange);
+		return () => window.removeEventListener("hashchange", hashChange);
+	}, [router.events]);
 
 	function getRenderList() {
 		return menu.menu?.[selectedTab ?? "category"];
 	}
 	
-	return <div className={commonStyles.management.splitScreen.container} key={stateChanged ? 1 : 0}>
+	return <div className={commonStyles.management.splitScreen.container}>
 		<div className="flex flex-col h-full">
 			<div className="flex sm:space-x-2 max-sm:flex-col-reverse mb-1.5 sm:items-center">
 				<div className={styles.tab.container}>

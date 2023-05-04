@@ -61,9 +61,9 @@ export default function Object() {
 	function object() {
 		if(objectData === undefined) return <p className={tw(commonStyles.management.title, "text-center")}>{selectMessage()}</p>;
 		switch (objectData.type) {
-			case "Category": return <CategoryEdit {...objectData} />
+			case "Category": return <CategoryEdit onChange={setModifiedData} {...objectData} />
 			case "Item": return <ItemEdit onChange={setModifiedData} {...objectData} />
-			case "Addon": return <AddonEdit {...objectData} />
+			case "Addon": return <AddonEdit onChange={setModifiedData} {...objectData} />
 		}
 	}
 
@@ -71,6 +71,7 @@ export default function Object() {
 		if(!modifiedData || !modifiedData._id) return;
 		await menu.modifyObject(modifiedData._id, modifiedData);
 		setUnsaved(false);
+		menu.reFetch();
 	}
 
 	return <div className={styles.outerContainer}>

@@ -12,26 +12,28 @@ export default function useMenu(admin: boolean) {
 	const [settings, setSettings] = useState<Settings>();
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
 
-	useEffect(() => {
-		(async function () {			
-			await postRequest("menu", { intent: "get" }, async response => {
+	async function reFetch() {		
+		await postRequest("menu", { intent: "get" }, async response => {
+			if(response.status === 200) {
+				const body = await response.json();
+				setMenu(body.menu);
+				setMenuLoaded(true);
+			}
+		});
+		
+		if(admin) {
+			await postRequest("menu", { intent: "getsettings" }, async response => {
 				if(response.status === 200) {
 					const body = await response.json();
-					setMenu(body.menu);
-					setMenuLoaded(true);
+					setSettings(body.settings);
+					setSettingsLoaded(true);
 				}
 			});
-			
-			if(admin) {
-				await postRequest("menu", { intent: "getsettings" }, async response => {
-					if(response.status === 200) {
-						const body = await response.json();
-						setSettings(body.settings);
-						setSettingsLoaded(true);
-					}
-				});
-			}
-		})();
+		}
+	}
+
+	useEffect(() => {
+		reFetch();
 	}, []);
 
 	async function addObject(object: Category | Item | Addon) {
@@ -71,7 +73,7 @@ export default function useMenu(admin: boolean) {
 	}
 
 	return {
-		menu, menuLoaded,
+		menu, menuLoaded, reFetch,
 		settings, settingsLoaded,
 		addObject, removeObject, modifyObject,
 		modifySettings

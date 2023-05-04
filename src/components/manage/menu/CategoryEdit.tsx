@@ -4,7 +4,7 @@ import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil";
 import { useRef } from "react";
 
-export default function CategoryEdit(props: Category) {
+export default function CategoryEdit(props: Category & { onChange: (category: Category) => void }) {
 	const nameInput = useRef<HTMLInputElement>(null);
 	const descriptionInput = useRef<HTMLTextAreaElement>(null);
 

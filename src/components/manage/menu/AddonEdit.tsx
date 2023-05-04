@@ -4,7 +4,7 @@ import { Addon } from "@/menu/structures";
 import commonStyles from "@/styles/common";
 import { useRef } from "react";
 
-export default function AddonEdit(props: Addon) {
+export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => void }) {
 	const nameInput = useRef<HTMLInputElement>(null);
 	const priceInput = useRef<HTMLInputElement>(null);
 
