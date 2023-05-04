@@ -11,6 +11,7 @@ import useMenu from "@/hooks/useMenu";
 import { formatMoney } from "@/menu/moneyUtil";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Category, Item, Addon } from "@/menu/structures";
 
 const styles = {
 	tab: {
@@ -69,17 +70,56 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 	useEffect(() => {
 		function hashChange() {
-			if(window.location.hash === "") {
+			if(window.location.hash === "" || window.location.hash === "#d") {
 				menu.reFetch();
 			}
 		}
 
 		window.addEventListener("hashchange", hashChange);
 		return () => window.removeEventListener("hashchange", hashChange);
-	}, [router.events]);
+	}, []);
 
 	function getRenderList() {
 		return menu.menu?.[selectedTab ?? "category"];
+	}
+
+	async function addObject() {
+		if(selectedTab !== undefined) {
+			let newObj: Category | Item | Addon;
+
+			switch (selectedTab) {
+				case "category": {
+					newObj = {
+						type: "Category",
+						name: "New category",
+						description: "Category description"
+					}
+					break;
+				}
+				case "item": {
+					newObj = {
+						type: "Item",
+						price: 0.00,
+						name: "New item",
+						description: "Item description",
+						addons: [],
+						categoryIDs: []
+					}
+					break;
+				}
+				case "addon": {
+					newObj = {
+						type: "Addon",
+						price: 0.00,
+						name: "New addon"
+					}
+					break;
+				}
+			}
+
+			await menu.addObject(newObj);
+			await menu.reFetch();
+		}
 	}
 	
 	return <div className={commonStyles.management.splitScreen.container}>
@@ -158,11 +198,11 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 						</div>
 					</ListItem>
 				}
-				<button className={styles.newButton}></button>
+				<button onClick={addObject} className={styles.newButton}></button>
 			</List>
 		</div>
 		<div onClick={e => { if(e.target === e.currentTarget) router.push(`/manage/menu/${selectedTab}`) }} className={commonStyles.management.splitScreen.details.backdrop(selectedObjectId !== undefined)}>
-			<div className={commonStyles.management.splitScreen.details.container}>
+			<div className={commonStyles.management.splitScreen.details.container} key={selectedObjectId?.toString()}>
 				{props.children}
 			</div>
 		</div>

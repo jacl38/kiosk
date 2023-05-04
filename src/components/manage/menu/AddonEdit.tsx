@@ -2,7 +2,7 @@ import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import { formatMoney } from "@/menu/moneyUtil";
 import { Addon } from "@/menu/structures";
 import commonStyles from "@/styles/common";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => void }) {
 	const nameInput = useRef<HTMLInputElement>(null);
@@ -10,11 +10,27 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 
 	const { unsaved, setUnsaved } = useUnsavedChanges();
 	
+	const [addonName, setAddonName] = useState(props.name);
+	const [addonPrice, setAddonPrice] = useState(props.price);
+
+	useEffect(() => {
+		const newAddon: Addon = {
+			type: "Addon",
+			_id: props._id,
+			name: addonName || props.name,
+			price: addonPrice || props.price
+		}
+		props.onChange?.(newAddon);
+	}, [addonName, addonPrice]);
+
 	return <div className="flex space-x-2">
 		<div className="w-full">
 			<label className={commonStyles.management.subtitle} htmlFor="name-input">Addon name:</label>
 			<input
-				onChange={e => setUnsaved(true)}
+				onChange={e => {
+					setAddonName(e.target.value);
+					setUnsaved(true);
+				}}
 				id="name-input"
 				ref={nameInput}
 				type="text"
@@ -25,7 +41,11 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 		<div>
 			<label className={commonStyles.management.subtitle} htmlFor="price-input">Price:</label>
 			<input
-				onChange={e => setUnsaved(true)}
+				onChange={e => {
+					const price = parseFloat(e.target.value);
+					setAddonPrice(Number.isNaN(price) ? 0 : price);
+					setUnsaved(true);
+				}}
 				id="price-input"
 				ref={priceInput}
 				type="number"

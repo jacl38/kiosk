@@ -28,9 +28,9 @@ export default function ItemEdit(props: Item & { onChange: (item: Item) => void 
 		const newItem: Item = {
 			type: "Item",
 			_id: props._id,
-			name: itemName,
-			price: itemPrice,
-			description: itemDescription,
+			name: itemName || props.name,
+			price: itemPrice || props.price,
+			description: itemDescription || props.description,
 			addons: selectedAddons.map(a => ({
 				id: a,
 				enabled: false

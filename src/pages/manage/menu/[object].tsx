@@ -74,11 +74,19 @@ export default function Object() {
 		menu.reFetch();
 	}
 
+	async function deleteObject() {
+		if(objectData && objectData._id && confirm(`Really delete ${objectData.name}? This cannot be undone.`)) {
+			await menu.removeObject(objectData.type, objectData._id);
+			window.location.hash = "d";
+			menu.reFetch();
+		}
+	}
+
 	return <div className={styles.outerContainer}>
 		{
 			objectData &&
 				<div className={styles.topBar.container}>
-					<button className={commonStyles.management.button}>
+					<button onClick={deleteObject} className={commonStyles.management.button}>
 						<span className="text-rose-700">&#10754;</span> Delete
 					</button>
 
