@@ -13,7 +13,7 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 	// If admin account does not exist, route user to main page where admin account creation can begin
 	const defaultThen = then ?? ((valid: boolean, hasAdminAccount: boolean) => {
 		if(!valid) {
-			router.push(hasAdminAccount ? `/login?redirect=${router.asPath}` : "/");
+			router.push(hasAdminAccount ? `/login?redirect=${window.location.pathname}` : "/");
 		}
 	});
 

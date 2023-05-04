@@ -51,7 +51,6 @@ const commonStyles = {
 			`before:absolute before:-ml-6`
 		),
 		backButton: tw(
-			`max-sm:-top-1`,
 			`text-5xl`,
 			`flex items-center justify-center`,
 			`pb-3 pr-1`,

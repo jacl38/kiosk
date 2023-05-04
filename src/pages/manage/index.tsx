@@ -3,11 +3,15 @@ import withLoading from "@/components/higherOrder/withLoading";
 import MenuButton from "@/components/manage/MenuButton";
 import useAuth from "@/hooks/useAuth";
 import commonStyles from "@/styles/common";
+import postRequest from "@/utility/netUtil";
 import { tw } from "@/utility/tailwindUtil";
 import { AnimatePresence, motion } from "framer-motion";
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react"
+import { AuthRequest } from "../api/auth";
+import useMenu from "@/hooks/useMenu";
 
 const styles = {
 	header: tw(
@@ -77,7 +81,7 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 
 	return <div className={commonStyles.management.outerContainer}>
 		{
-			withLoading(authenticated === "unknown", <>
+			withLoading(authenticated === "unknown" || authenticated === "unauthenticated", <>
 				<header className={styles.header}>
 					<div className="flex items-center space-x-2">
 						{/* Back to main screen button */}

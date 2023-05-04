@@ -77,8 +77,8 @@ export default function Login() {
 			if(response.status === 200) {
 				// Credentials are accepted
 				// Go to redirect route from url, if exists
-				const redirect = router.query.redirect as string ?? "/";
-				router.push({ href: redirect });
+				const redirect = router.query.redirect as string ?? "./";
+				router.push(redirect);
 			} else {
 				// Credentials are rejected
 				setIncorrect(true);
@@ -117,7 +117,7 @@ export default function Login() {
 		</form>
 
 		{/* Back button to main screen */}
-		<Link href="/" className={commonStyles.management.backButton}>&lsaquo;</Link>
+		<Link href="/" className={tw(commonStyles.management.backButton, "absolute left-2 top-2")}>&lsaquo;</Link>
 		<DarkButton />
 	</div>
 }
