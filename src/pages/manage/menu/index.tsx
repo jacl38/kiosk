@@ -1,5 +1,5 @@
-import { ReactElement, useContext, useEffect, useState } from "react"
-import Index from "."
+import { ReactElement, ReactNode, useContext, useEffect, useState } from "react"
+import Index from ".."
 import useUnsavedChanges, { UnsavedContext } from "@/hooks/useUnsavedChanges";
 import commonStyles from "@/styles/common";
 import List from "@/components/manage/List";
@@ -12,10 +12,8 @@ import { motion } from "framer-motion";
 import withLoading from "@/components/higherOrder/withLoading";
 import useMenu from "@/hooks/useMenu";
 import { formatMoney } from "@/menu/moneyUtil";
-import CategoryEdit from "@/components/manage/menu/CategoryEdit";
-import ItemEdit from "@/components/manage/menu/ItemEdit";
-import AddonEdit from "@/components/manage/menu/AddonEdit";
-import ObjectEdit from "@/components/manage/menu/ObjectEdit";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const styles = {
 	tab: {
@@ -45,69 +43,71 @@ const styles = {
 	)
 }
 
-const tabs = [
-	{ type: "Category", label: "Categories" },
-	{ type: "Item", label: "Items" },
-	{ type: "Addon", label: "Addons" },
-];
+// const tabs = [
+// 	{ type: "Category", label: "Categories" },
+// 	{ type: "Item", label: "Items" },
+// 	{ type: "Addon", label: "Addons" },
+// ];
 
-export default function Menu() {
+const tabs = {
+	category: { type: "Category", label: "Categories" },
+	item: { type: "Item", label: "Items" },
+	addon: { type: "Addon", label: "Addons" },
+}
+
+export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	const { unsaved, setUnsaved } = useUnsavedChanges();
+
+	const router = useRouter();
 	
 	const [stateChanged, setStateChanged] = useState(false);
 	const [selectedObjectId, setSelectedObjectId] = useState<ObjectId>();
-	const { unsaved: pageUnsaved, setUnsaved: setPageUnsaved } = useContext(UnsavedContext);
 	const { unsaved: objectUnsaved, setUnsaved: setObjectUnsaved } = useUnsavedChanges();
 
-	const [tabIndex, setTabIndex] = useState(0);
-	const selectedType = tabs[tabIndex];
+	const [selectedTab, setSelectedTab] = useState<keyof typeof tabs>();
+	const tab = tabs[selectedTab ?? "category"] ?? { label: "Object", type: "None" };
+
+	useEffect(() => {
+		const route = router.pathname.split("/").slice(1).pop() ?? ""
+		if(route === "menu") {
+			router.push("/manage/menu/category");
+		}
+		setSelectedTab(route as keyof typeof tabs);
+
+		setUnsaved(router.pathname.includes("#"));
+	}, [router.pathname]);
 
 	const menu = useMenu(true);
-	const key = tabs[tabIndex].label.toLowerCase() as "categories" | "items" | "addons";
 
 	function getRenderList() {
-		return menu.menu?.[key];
+		return menu.menu?.[selectedTab ?? "category"];
 	}
 
 	function getSelectedObject(): Category | Item | Addon | undefined {
 		return getRenderList()?.map(o => o as any).find(o => o._id === selectedObjectId);
 	}
-
-	function selectObject(object: Category | Item | Addon | undefined) {
-		if(getSelectedObject() === undefined) {
-			setSelectedObjectId(object?._id);
-			return;
-		}
-
-		if(objectUnsaved) {
-			if(confirm(`There are unsaved changes to this ${getSelectedObject()?.type}. If you leave now, these changes will be lost.`)) {
-				setSelectedObjectId(object?._id);
-				setObjectUnsaved(false);
-				setPageUnsaved?.(false);
-			}
-		} else {
-			setSelectedObjectId(object?._id);
-		}
-	}
-
+	
 	return <div className={commonStyles.management.splitScreen.container} key={stateChanged ? 1 : 0}>
 		<div className="flex flex-col h-full">
 			<div className="flex sm:space-x-2 max-sm:flex-col-reverse mb-1.5 sm:items-center">
 				<div className={styles.tab.container}>
-					{tabs.map((tab, i) => <button
-						key={tab.label}
-						onClick={e => { e.preventDefault(); setTabIndex(i); }}
-						className="relative px-1 py-1 w-full">
-							{
-								tabIndex === i &&
-								<motion.div
-									layoutId="active-menu-tab"
-									transition={{ ease: "backOut" }}
-									className={styles.tab.overlay}>
-								</motion.div>
-							}
-							<span className={tw()}>{tab.label}</span>
-					</button>)}
+					{Object.keys(tabs).map((t, i) => {
+						const route = t as keyof typeof tabs;
+						const tab = tabs[route];
+						return <Link href={`/manage/menu/${tab.type.toLowerCase()}`}
+							key={tab.label}
+							className="relative px-1 py-1 w-full flex items-center justify-center">
+								{
+									route === selectedTab &&
+									<motion.div
+										layoutId="active-menu-tab"
+										transition={{ ease: "backOut" }}
+										className={styles.tab.overlay}>
+									</motion.div>
+								}
+								<span className={commonStyles.management.subtitle}>{tab.label}</span>
+						</Link>
+					})}
 					<button className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
 						&#x1f705;
 					</button>
@@ -115,13 +115,23 @@ export default function Menu() {
 				<div className="min-w-[6rem] w-0 max-sm:w-full max-sm:mb-2">
 					{
 						withLoading(!menu.settingsLoaded,
-							<form onChange={e => setPageUnsaved?.(true)} onSubmit={e => e.preventDefault()} >
-								<TextConfirmField inputProps={{
-									placeholder: `${menu.settings?.taxRate ?? 0}`
+							<TextConfirmField
+								onSubmit={v => {
+									if(menu.settings) {
+										menu.modifySettings({...menu.settings, taxRate: parseFloat(v)});
+									}
 								}}
-								label="Tax Rate"
-								suffix="%" />
-							</form>
+								inputProps={{
+									onBlur: e => {
+										if(menu.settings) {
+											menu.modifySettings({...menu.settings, taxRate: parseFloat(e.target.value ?? 0)});
+										}
+									},
+									placeholder: `${menu.settings?.taxRate ?? 0}`
+								}
+							}
+							label="Tax Rate"
+							suffix="%" />
 						)
 					}
 				</div>
@@ -132,7 +142,7 @@ export default function Menu() {
 					? withLoading(!menu.menuLoaded,
 						getRenderList()?.map((object, i) => {
 							return <ListItem key={i}
-								onClick={() => selectObject(object)}
+								onClick={() => router.push(`/manage/menu/${selectedTab}?id=${object._id.toString()}`)}
 								selected={selectedObjectId === object._id}>
 								<div className="flex h-full p-3">
 									<div className="flex flex-col justify-between grow-0 w-[calc(100%-2rem)] truncate">
@@ -148,7 +158,7 @@ export default function Menu() {
 						})
 					) : <ListItem>
 						<div className="flex flex-col justify-between h-full p-3">
-							<p className="font-bold">No {tabs[tabIndex].label} found.</p>
+							<p className="font-bold">No {tab.label} found.</p>
 							<p>Click the button below to get started.</p>
 						</div>
 					</ListItem>
@@ -156,13 +166,9 @@ export default function Menu() {
 				<button className={styles.newButton}></button>
 			</List>
 		</div>
-		<div onClick={e => { if(e.target === e.currentTarget) selectObject(undefined) }} className={commonStyles.management.splitScreen.details.backdrop(selectedObjectId !== undefined)}>
+		<div onClick={e => { if(e.target === e.currentTarget) router.push(`/manage/menu/${selectedTab}`) }} className={commonStyles.management.splitScreen.details.backdrop(selectedObjectId !== undefined)}>
 			<div className={commonStyles.management.splitScreen.details.container}>
-				{
-					getSelectedObject() !== undefined
-						? <ObjectEdit object={getSelectedObject()} />
-						: <h2 className={tw(commonStyles.management.title, "text-center")}>Select a{"AEIOU".includes(selectedType.type[0]) ? "n" : ""} {selectedType.type} from the list</h2>
-				}
+				{props.children}
 			</div>
 		</div>
 	</div>

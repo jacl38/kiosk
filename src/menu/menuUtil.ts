@@ -38,16 +38,16 @@ export async function getOrders() {
 }
 
 export type Menu = {
-	categories: Category[],
-	items: Item[],
-	addons: Addon[]
+	category: Category[],
+	item: Item[],
+	addon: Addon[]
 }
 
 export async function getMenu(): Promise<Menu> {
-	const categories = await getCategories();
-	const items = await getItems();
-	const addons = await getAddons();
-	return { categories, items, addons }
+	const category = await getCategories();
+	const item = await getItems();
+	const addon = await getAddons();
+	return { category, item, addon }
 }
 
 // Helper functions to add menu structure objects to database collections

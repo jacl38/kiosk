@@ -16,7 +16,7 @@ const styles = {
 		`border rounded-xl`,
 		`border-stone-400 dark:border-gray-600`,
 		`m-auto p-4`,
-		`transition-all`,
+		`transition-colors`,
 	),
 	// Adds a green checkmark or red x depending on
 	// if the admin account is logged in

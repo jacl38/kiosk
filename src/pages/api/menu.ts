@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				case "modify": {
 					if(authorized) {
 						const modified = await (await getCollectionByType(request.modifiedObject.type))
-							.updateOne({ _id: request.id }, request.modifiedObject);
+							.replaceOne({ _id: request.id }, request.modifiedObject);
 						if(modified.acknowledged) {
 							res.status(200).send({ message: `Modified ${modified.modifiedCount} from ${request.modifiedObject.type}` });
 						} else {
@@ -97,12 +97,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				}
 				case "modifysettings": {
 					if(authorized) {
-						const modified = await (await getCollection(SettingsCollectionName))
-							.updateOne({}, request.modifiedSettings);
-						if(modified.acknowledged) {
+						const settingsCollection = await getCollection(SettingsCollectionName);
+						const result = await settingsCollection.updateOne({ $where: () => true }, { $set: {
+							taxRate: request.modifiedSettings.taxRate
+						} as Settings }, { upsert: true });
+						if(result.acknowledged) {
 							res.status(200).send({ message: "Modified settings" });
 						} else {
-							res.status(500).send({ error: "An error occurred. No settings changed." });
+							res.status(500).send({ error: "An error ocurred. No settings changed." });
 						}
 					} else {
 						res.status(401).send({ error: "Unauthorized" });

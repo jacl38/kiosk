@@ -51,14 +51,14 @@ const commonStyles = {
 			`before:absolute before:-ml-6`
 		),
 		backButton: tw(
-			`absolute`,
-			`sm:left-4 sm:top-4`,
 			`max-sm:-top-1`,
 			`text-5xl`,
 			`flex items-center justify-center`,
 			`pb-3 pr-1`,
 			`w-16 h-16`,
-			`hover:bg-stone-300 dark:hover:bg-gray-700`,
+			`bg-gray-700 dark:bg-stone-300`,
+			`bg-opacity-0 dark:bg-opacity-0`,
+			`hover:bg-opacity-20 dark:hover:bg-opacity-20`,
 			`rounded-full`,
 			`transition-all`
 		),
