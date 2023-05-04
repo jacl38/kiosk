@@ -71,11 +71,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "modify": {
+					console.log(request);
 					if(authorized) {
-						const modified = await (await getCollectionByType(request.modifiedObject.type))
-							.replaceOne({ _id: request.id }, request.modifiedObject);
-						if(modified.acknowledged) {
-							res.status(200).send({ message: `Modified ${modified.modifiedCount} from ${request.modifiedObject.type}` });
+						delete request.modifiedObject._id;
+
+						const objectCollection = await getCollectionByType(request.modifiedObject.type);
+						const result = await objectCollection.replaceOne({
+							$where() { return this._id === request.id } },
+							request.modifiedObject);
+
+						if(result.acknowledged) {
+							res.status(200).send({ message: `Modified ${result.modifiedCount} from ${request.modifiedObject.type}` });
 						} else {
 							res.status(500).send({ error: "An error ocurred. No object deleted." });
 						}

@@ -1,6 +1,7 @@
 import { tw } from "@/utility/tailwindUtil"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import commonStyles from "@/styles/common"
+import withLoading from "../higherOrder/withLoading"
 
 const styles = {
 	outerContainer: tw(
@@ -28,12 +29,19 @@ const styles = {
 
 type Option = {
 	id: any,
-	label: string
+	label: string,
+	checked: boolean
 }
 
-export default function MultiPicker(props: { keyId: string, options: Option[] }) {
-
-	const [checked, setChecked] = useState<any[]>([]);
+export default function MultiPicker(props: {
+	keyId: string,
+	options: Option[],
+	onChange?: (checked: any[]) => void
+}) {
+	const [checked, setChecked] = useState<any[]>(() => {
+		console.log(props.options);
+		return props.options.filter(o => o.checked).map(o => o.id)
+	});
 
 	return <ul className={styles.outerContainer}>
 		{
@@ -41,14 +49,26 @@ export default function MultiPicker(props: { keyId: string, options: Option[] })
 				const isChecked = checked.includes(option.id);
 
 				return <li key={`${props.keyId}-${option.id}`} className={styles.listItem(isChecked)}>
-					<label className={styles.label(isChecked)} htmlFor={option.id}>{option.label}</label>
-					<input onChange={e => setChecked(c => {
-						if(e.target.checked) {
-							return Array.from(new Set([...c, option.id]));
-						} else {
-							return Array.from(new Set(c.filter(id => id !== option.id)))
-						}
-					})} className={commonStyles.management.checkbox} type="checkbox" id={option.id} />
+					<label
+						className={styles.label(isChecked)}
+						htmlFor={option.id}>
+							{option.label}
+					</label>
+					<input
+						onChange={e => {
+							setChecked(c => {
+								const newChecked = isChecked
+									? Array.from(new Set(c?.filter(cc => cc !== option.id)))
+									: Array.from(new Set([...c, option.id]));
+								props.onChange?.(newChecked);
+								return newChecked;
+							});
+						}}
+						checked={isChecked}
+						className={commonStyles.management.checkbox}
+						type="checkbox"
+						id={option.id}
+					/>
 				</li>
 			})
 		}

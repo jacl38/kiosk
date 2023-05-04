@@ -57,6 +57,7 @@ export default function useMenu(admin: boolean) {
 		const request: MenuRequest = { intent: "modify", id, modifiedObject };
 
 		await postRequest("menu", request, async response => {
+			console.log(response);
 			return response.status === 200;
 		});
 	}

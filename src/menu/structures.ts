@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 interface IBuyable {
-	_id: ObjectId,
+	_id?: ObjectId,
 	name: string,
 	price: number
 }
@@ -11,7 +11,7 @@ export interface Item extends IBuyable {
 	type: "Item",
 	description: string,
 	categoryIDs: ObjectId[],
-	addons: { id: ObjectId, enabled: boolean }
+	addons: { id: ObjectId, enabled: boolean }[]
 }
 
 export const AddonCollectionName = "MenuAddon";
@@ -26,7 +26,7 @@ export type Settings = {
 
 export const CategoryCollectionName = "MenuCategory";
 export type Category = {
-	_id: ObjectId,
+	_id?: ObjectId,
 	type: "Category",
 	name: string,
 	description: string
@@ -40,7 +40,7 @@ export type OrderPart = {
 
 export const OrderCollectionName = "MenuOrder";
 export type Order = {
-	_id: ObjectId,
+	_id?: ObjectId,
 	parts: OrderPart[],
 	notes: string,
 	name: string,

@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode, useContext, useEffect, useState } from "react"
 import Index from ".."
-import useUnsavedChanges, { UnsavedContext } from "@/hooks/useUnsavedChanges";
+import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import commonStyles from "@/styles/common";
 import List from "@/components/manage/List";
 import ListItem from "@/components/manage/ListItem";
@@ -50,8 +50,6 @@ const tabs = {
 }
 
 export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
-	const { unsaved, setUnsaved } = useUnsavedChanges();
-
 	const router = useRouter();
 	
 	const [stateChanged, setStateChanged] = useState(false);
@@ -69,17 +67,12 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 		setSelectedTab(objectType);
 		setSelectedObjectId(router.query.id as string);
-		setUnsaved(router.asPath.includes("#"));
 	}, [router.asPath]);
 
 	const menu = useMenu(true);
 
 	function getRenderList() {
 		return menu.menu?.[selectedTab ?? "category"];
-	}
-
-	function getSelectedObject(): Category | Item | Addon | undefined {
-		return getRenderList()?.map(o => o as any).find(o => o._id === selectedObjectId);
 	}
 	
 	return <div className={commonStyles.management.splitScreen.container} key={stateChanged ? 1 : 0}>

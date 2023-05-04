@@ -33,6 +33,7 @@ export default function Object() {
 	const objectType = router.query.object as "category" | "item" | "addon" | undefined;
 
 	const [objectData, setObjectData] = useState<Category | Item | Addon>();
+	const [modifiedData, setModifiedData] = useState<Category | Item | Addon>();
 	const { id } = router.query;
 	const menu = useMenu(true);
 
@@ -58,9 +59,14 @@ export default function Object() {
 		if(objectData === undefined) return <p className={tw(commonStyles.management.title, "text-center")}>{selectMessage()}</p>;
 		switch (objectData.type) {
 			case "Category": return <CategoryEdit {...objectData} />
-			case "Item": return <ItemEdit {...objectData} />
+			case "Item": return <ItemEdit onChange={setModifiedData} {...objectData} />
 			case "Addon": return <AddonEdit {...objectData} />
 		}
+	}
+
+	async function saveObject() {
+		if(!modifiedData || !modifiedData._id) return;
+		await menu.modifyObject(modifiedData._id, modifiedData);
 	}
 
 	return <div className={styles.outerContainer}>
@@ -71,7 +77,7 @@ export default function Object() {
 						<span className="text-rose-700">&#10754;</span> Delete
 					</button>
 
-					<button className={commonStyles.management.button}>
+					<button onClick={saveObject} className={commonStyles.management.button}>
 						<span className="text-green-700">&#10003;</span> Save
 					</button>
 				</div>
