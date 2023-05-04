@@ -70,7 +70,7 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 	useEffect(() => {
 		const route = router.pathname.split("/").slice(1)[1] ?? ""
 		if(route === "") {
-			router.push("manage/menu");
+			router.push("manage/menu/category");
 		}
 		setTabRoute(route as keyof typeof tabs);
 	}, [router.pathname]);
@@ -162,7 +162,9 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 									transition={{ duration: 0.3 }}
 									key={`tab-${tabRoute}-content`}
 									className="overflow-y-scroll h-full relative">
+
 									{props.children}
+
 								</motion.div>
 							</motion.div>
 						</AnimatePresence>

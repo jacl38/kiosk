@@ -77,8 +77,8 @@ export default function Login() {
 			if(response.status === 200) {
 				// Credentials are accepted
 				// Go to redirect route from url, if exists
-				const redirect = new URLSearchParams(window.location.search).get("redirect") ?? "";
-				router.push(redirect);
+				const redirect = router.query.redirect as string ?? "/";
+				router.push({ href: redirect });
 			} else {
 				// Credentials are rejected
 				setIncorrect(true);

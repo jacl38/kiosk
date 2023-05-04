@@ -1,6 +1,6 @@
 import { AuthRequest } from "@/pages/api/auth";
 import postRequest from "@/utility/netUtil";
-import { useRouter } from "next/router";
+import { useRouter, Router } from "next/router";
 import { useEffect, useState } from "react";
 
 /** Hook used to provide admin login authentication for a page/component.
@@ -13,7 +13,7 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 	// If admin account does not exist, route user to main page where admin account creation can begin
 	const defaultThen = then ?? ((valid: boolean, hasAdminAccount: boolean) => {
 		if(!valid) {
-			router.push(hasAdminAccount ? `/login?redirect=${router.route.substring(1)}` : "/");
+			router.push(hasAdminAccount ? `/login?redirect=${router.asPath}` : "/");
 		}
 	});
 
