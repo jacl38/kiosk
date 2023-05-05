@@ -9,6 +9,7 @@ interface IBuyable {
 export const ItemCollectionName = "MenuItem";
 export interface Item extends IBuyable {
 	type: "Item",
+	imageID?: ObjectId,
 	description: string,
 	categoryIDs: ObjectId[],
 	addons: { id: ObjectId, enabled: boolean }[]

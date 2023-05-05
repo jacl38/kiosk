@@ -2,11 +2,12 @@ import { formatMoney } from "@/menu/moneyUtil";
 import { Item } from "@/menu/structures";
 import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
 import MultiPicker from "../MultiPicker";
 import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import { ObjectId } from "mongodb";
 import useMenu from "@/hooks/useMenu";
+import ImageUpload from "../ImageUpload";
 
 export default function ItemEdit(props: Item & { onChange: (item: Item) => void }) {
 
@@ -88,6 +89,10 @@ export default function ItemEdit(props: Item & { onChange: (item: Item) => void 
 				</div>
 
 			</div>
+			{/* <label>Upload an image</label> */}
+			{/* <input onChange={uploadImage} id="image-upload" type="file" accept="image/png, image/jpeg" /> */}
+			<ImageUpload keyId="item-image" />
+			{/* <img className={image ? "" : "hidden"} ></img> */}
 		</div>
 		<div className="w-full h-full flex flex-col space-y-2">
 			<label className={commonStyles.management.subtitle}>Categories:</label>
