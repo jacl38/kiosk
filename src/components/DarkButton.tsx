@@ -3,7 +3,7 @@ import { tw } from "@/utility/tailwindUtil";
 
 const styles = {
 	button: tw(
-		`fixed right-4 bottom-4`,
+		`fixed right-4 bottom-4 z-10`,
 		`w-16 h-16`,
 		`bg-gray-800 dark:bg-stone-200`,
 		`text-white dark:text-black`,

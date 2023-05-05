@@ -12,6 +12,8 @@ import { formatMoney } from "@/menu/moneyUtil";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Category, Item, Addon } from "@/menu/structures";
+import MultiPicker from "@/components/manage/MultiPicker";
+import { ObjectId } from "mongodb";
 
 const styles = {
 	tab: {
@@ -38,13 +40,55 @@ const styles = {
 		`before:absolute before:w-1.5 before:h-6 before:bg-gray-700 before:dark:bg-stone-300 before:transition-all`,
 		`hover:scale-110`,
 		`transition-all ease-out`
-	)
+	),
+	filterPanel: {
+		backdrop: tw(
+			`fixed inset-0 z-10`,
+			`backdrop-blur-sm`,
+			`bg-gray-700 dark:bg-stone-800`,
+			`bg-opacity-20 dark:bg-opacity-20`,
+			`transition-[backdrop-filter,opacity] duration-200`,
+		),
+		container: tw(
+			`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`,
+			`bg-stone-200 dark:bg-gray-600`,
+			`border-2 border-stone-400 dark:border-gray-500`,
+			`rounded-2xl`,
+			`w-[36rem] h-96`,
+			`max-sm:rounded-none max-sm:w-full`,
+			`p-4`,
+			`flex flex-col`,
+			`transition-all`
+		),
+		closeButton: tw(
+			`w-8 h-8`,
+			`hover:bg-stone-300 dark:hover:bg-gray-500`,
+			`rounded-full`,
+			`transition-colors`
+		)
+	}
 }
 
 const tabs = {
 	category: { type: "Category", label: "Categories" },
 	item: { type: "Item", label: "Items" },
 	addon: { type: "Addon", label: "Addons" },
+}
+
+type MenuObject = Category | Item | Addon;
+
+const sortModes = {
+	alphabetical: {
+		label: "Alphabetical",
+		fn: (a: MenuObject, b: MenuObject) => a.name > b.name
+	},
+	price: {
+		label: "Price",
+		fn: (a: MenuObject, b: MenuObject) => {
+			if(!("price" in a && "price" in b)) return false;
+			return a.price > b.price;
+		}
+	}
 }
 
 export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
@@ -54,6 +98,10 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 	const [selectedTab, setSelectedTab] = useState<keyof typeof tabs>();
 	const tab = tabs[selectedTab ?? "category"] ?? { label: "Object", type: "None" };
+
+	const [showSortMenu, setShowSortMenu] = useState(false);
+	const [selectedSortMode, setSelectedSortMode] = useState<keyof typeof sortModes>();
+	const [selectedCategories, setSelectedCategories] = useState<ObjectId[]>([]);
 
 	useEffect(() => {
 		const route = router.pathname.split("/").slice(1).pop() ?? "";
@@ -81,7 +129,19 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	}, []);
 
 	function getRenderList() {
-		return menu.menu?.[selectedTab ?? "category"];
+		let allCategoryObjects = menu.menu?.[selectedTab ?? "category"];
+		const sortMode = selectedSortMode && sortModes[selectedSortMode];
+		if(sortMode) {
+			allCategoryObjects?.sort((a: MenuObject, b: MenuObject) => sortMode.fn(a, b) ? 1 : -1);
+		}
+
+		if(selectedTab === "item" && selectedCategories?.length) {
+			allCategoryObjects = (allCategoryObjects as Item[]).filter(i => {
+				return i.categoryIDs.some(id => selectedCategories.includes(id))
+			});
+		}
+
+		return allCategoryObjects;
 	}
 
 	async function addObject() {
@@ -144,9 +204,57 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 								<span className={commonStyles.management.subtitle}>{tab.label}</span>
 						</Link>
 					})}
-					<button className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
-						&#x1f705;
+					<button
+						onClick={() => setShowSortMenu(true)}
+						className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
+							&#x1f705;
+							{
+								selectedCategories.length > 0 &&
+								<span className="w-3 h-3 bg-blue-500 absolute rounded-full"></span>
+							}
 					</button>
+
+					{
+						showSortMenu && 
+						<div onClick={() => setShowSortMenu(false)} className={styles.filterPanel.backdrop}>
+							<div onClick={e => e.stopPropagation()} className={styles.filterPanel.container}>
+								<div className="flex items-center justify-between">
+									<p className={commonStyles.management.title}>Filter/Sort {tab.label}</p>
+									<button className={styles.filterPanel.closeButton} onClick={() => setShowSortMenu(false)}>&#10754;</button>
+								</div>
+
+								<hr className={commonStyles.management.separator} />
+
+								<label htmlFor="sort-select" className={tw(commonStyles.management.subtitle, "ml-2")}>Sort by...</label>
+								<select onChange={e => setSelectedSortMode(e.target.value as keyof typeof sortModes)} id="sort-select" className={commonStyles.management.inputBox}>
+									{
+										Object.keys(sortModes).map(mode => {
+											const sortMode = sortModes[mode as keyof typeof sortModes];
+											return <option value={mode} selected={selectedSortMode === mode}>{sortMode.label}</option>
+										})
+									}
+								</select>
+
+								{
+									tab.type === "Item" &&
+									<div className="h-48 mt-4">
+										<div className="flex justify-between px-2">
+											<p className={commonStyles.management.subtitle}>Filter by category...</p>
+										</div>
+										<MultiPicker
+											keyId="category-filter"
+											onChange={ids => setSelectedCategories(ids)}
+											options={menu.menu!.category.map((c, i) => ({
+												id: c._id,
+												label: c.name,
+												checked: c._id ? selectedCategories.includes(c._id) : false
+											}))}/>
+									</div>
+								}
+							</div>
+						</div>
+					}
+
 				</div>
 				<div className="min-w-[6rem] w-0 max-sm:w-full max-sm:mb-2">
 					{
@@ -172,6 +280,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 					}
 				</div>
 			</div>
+
 			<List>
 				{
 					(getRenderList()?.length ?? 0) > 0

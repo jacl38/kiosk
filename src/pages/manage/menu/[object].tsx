@@ -76,6 +76,7 @@ export default function Object() {
 
 	async function deleteObject() {
 		if(objectData && objectData._id && confirm(`Really delete ${objectData.name}? This cannot be undone.`)) {
+			console.log(`Removing ${objectData.name} ${objectData._id}`);
 			await menu.removeObject(objectData.type, objectData._id);
 			window.location.hash = "d";
 			menu.reFetch();

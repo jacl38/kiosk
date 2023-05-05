@@ -1,7 +1,6 @@
 import { tw } from "@/utility/tailwindUtil"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import commonStyles from "@/styles/common"
-import withLoading from "../higherOrder/withLoading"
 
 const styles = {
 	outerContainer: tw(

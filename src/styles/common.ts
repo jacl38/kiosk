@@ -23,9 +23,9 @@ const commonStyles = {
 		button: tw(
 			`px-4 py-1`,
 			`font-bold`,
-			`bg-stone-300 dark:bg-gray-600`,
-			`enabled:hover:bg-stone-400 enabled:dark:hover:bg-gray-700`,
-			`border-2 border-stone-400 dark:border-gray-700`,
+			`bg-stone-300 dark:bg-gray-700`,
+			`enabled:hover:bg-stone-400 enabled:dark:hover:bg-gray-600`,
+			`border-2 border-stone-400 dark:border-gray-600`,
 			`rounded-full`,
 			`shrink-0`,
 			`disabled:opacity-50 disabled:cursor-not-allowed`,
@@ -84,8 +84,7 @@ const commonStyles = {
 				`gap-4`
 			),
 			details: {
-				backdrop: (open: boolean) => tw(
-					open ? tw(
+				backdrop: (open: boolean) => open ? tw(
 						`max-lg:fixed max-lg:inset-0`,
 						`max-lg:backdrop-blur-sm`,
 						`max-lg:bg-gray-700 max-lg:dark:bg-stone-800`,
@@ -93,7 +92,6 @@ const commonStyles = {
 						`max-lg:flex`,
 						`transition-[backdrop-filter,opacity] duration-200`,
 					) : "max-lg:hidden",
-					``),
 				container: tw(
 					`h-full`,
 					`overflow-y-hidden`,
