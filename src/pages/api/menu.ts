@@ -70,9 +70,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				}
 				case "remove": {
 					if(authorized) {
-						const deleted = await (await getCollectionByType(request.type)).deleteOne({ $where() { return this._id === request.id } });
-						if(deleted.acknowledged) {
-							res.status(200).send({ message: `Remove ${deleted.deletedCount} from ${request.type}` });
+						const objectCollection = await getCollectionByType(request.type);
+
+						const result = await objectCollection.deleteOne({ _id: new ObjectId(request.id) });
+
+						if(result.acknowledged) {
+							res.status(200).send({ message: `Remove ${result.deletedCount} from ${request.type}` });
 						} else {
 							res.status(500).send({ error: "An error occurred. No object removed." });
 						}
