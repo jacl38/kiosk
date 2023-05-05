@@ -37,6 +37,11 @@ export async function getOrders() {
 	return await (await getCollection(OrderCollectionName)).find({}).toArray() as unknown as Order[];
 }
 
+export async function getImages() {
+	const allImages = (await getCollection("MenuImages")).find({}).toArray();
+	return await allImages as unknown as { _id: ObjectId, data: string }[];
+}
+
 export type Menu = {
 	category: Category[],
 	item: Item[],

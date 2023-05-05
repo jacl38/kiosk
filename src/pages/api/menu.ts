@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { query } from "./auth";
-import { getAddons, getCategories, getItems, getMenu } from "@/menu/menuUtil";
+import { getAddons, getCategories, getImages, getItems, getMenu } from "@/menu/menuUtil";
 import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName, Settings, SettingsCollectionName } from "@/menu/structures";
 import { Binary, ObjectId } from "mongodb";
 import getCollection from "./db";
@@ -39,12 +39,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		if(req.method === "POST") {
 			const authorized = (await query(req, res)).status === 200;
 			const menu = await getMenu();
+			const images = await getImages();
 
 			const request = req.body as MenuRequest;
 
 			switch (request.intent) {
 				case "get": {
-					res.status(200).send({ menu });
+					res.status(200).send({ menu, images });
 					return;
 				}
 				case "add": {

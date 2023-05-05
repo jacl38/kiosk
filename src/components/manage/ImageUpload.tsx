@@ -1,5 +1,5 @@
 import { tw } from "@/utility/tailwindUtil"
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 const styles = {
 	outerContainer: tw(
@@ -39,7 +39,8 @@ const styles = {
 }
 
 type ImageUploadProps = {
-	keyId: string
+	keyId: string,
+	defaultImg?: string,
 	onUpload?: (image64: string) => void,
 	maxBytes?: number
 }
@@ -48,8 +49,8 @@ type ImageUploadProps = {
 const tenMegabytes = 10 * 1024 * 1024;
 
 export default function ImageUpload(props: ImageUploadProps) {
-	const [image64, setImage64] = useState<string>();
-	const [url, setUrl] = useState<string>();
+	const [image64, setImage64] = useState<string | undefined>();
+	const [url, setUrl] = useState<string | undefined>(props.defaultImg ?? "");
 
 	function uploadImage(e: ChangeEvent<HTMLInputElement>) {
 		const file = e.target.files?.[0];
@@ -94,7 +95,7 @@ export default function ImageUpload(props: ImageUploadProps) {
 	}
 	
 	return <div className={styles.outerContainer}>
-		<img className={styles.img} src={url}></img>
+		<img className={styles.img} src={image64 ?? props.defaultImg}></img>
 		<label className={styles.label} htmlFor={props.keyId}>Pick an image</label>
 		<input accept="image/png, image/jpeg" onChange={uploadImage} hidden id={props.keyId} type="file" />
 		<button onClick={removeImage} className={styles.removeButton}>Remove</button>

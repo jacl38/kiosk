@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 export default function useMenu(admin: boolean) {
 	const [menu, setMenu] = useState<Menu>();
+	const [images, setImages] = useState<{ data: string, _id: ObjectId }[]>();
 	const [menuLoaded, setMenuLoaded] = useState(false);
 
 	const [settings, setSettings] = useState<Settings>();
@@ -17,6 +18,7 @@ export default function useMenu(admin: boolean) {
 			if(response.status === 200) {
 				const body = await response.json();
 				setMenu(body.menu);
+				setImages(body.images);
 				setMenuLoaded(true);
 			}
 		});
@@ -74,6 +76,7 @@ export default function useMenu(admin: boolean) {
 
 	return {
 		menu, menuLoaded, reFetch,
+		images,
 		settings, settingsLoaded,
 		addObject, removeObject, modifyObject,
 		modifySettings

@@ -11,12 +11,11 @@ import ImageUpload from "../ImageUpload";
 
 export default function ItemEdit(props: Item & { onChange: (item: Item & { imageData?: string }) => void }) {
 
+	const { unsaved, setUnsaved } = useUnsavedChanges();
+
 	const nameInput = useRef<HTMLInputElement>(null);
 	const descriptionInput = useRef<HTMLTextAreaElement>(null);
-
 	const priceInput = useRef<HTMLInputElement>(null);
-
-	const { unsaved, setUnsaved } = useUnsavedChanges();
 
 	const [itemName, setItemName] = useState(props.name);
 	const [itemPrice, setItemPrice] = useState(props.price);
@@ -24,7 +23,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 
 	const [selectedCategories, setSelectedCategories] = useState<ObjectId[]>(props.categoryIDs);
 	const [selectedAddons, setSelectedAddons] = useState<ObjectId[]>(props.addons.map(a => a.id));
-	const [imageData, setImageData] = useState<string>();
+	const [imageData, setImageData] = useState<string | undefined>();
 
 	useEffect(() => {
 		const newItem: Item = {
@@ -43,6 +42,13 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData]);
 
 	const menu = useMenu(true);
+
+	useEffect(() => {
+		if(menu.menuLoaded) {
+			const foundImage = menu.images?.find(i => i._id === props.imageID);
+			setImageData(foundImage?.data);
+		}
+	}, [menu.menuLoaded]);
 
 	return <div className="flex h-full max-xl:flex-col xl:space-x-2 max-xl:space-y-4 justify-between">
 		<div>
@@ -90,10 +96,12 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 				</div>
 
 			</div>
-			<ImageUpload keyId="item-image" onUpload={imageData => {
-				setImageData(imageData);
-				setUnsaved(true);
-			}} />
+			<div className="w-full flex justify-center p-4">
+				<ImageUpload defaultImg={imageData} keyId="item-image" onUpload={imageData => {
+					setImageData(imageData);
+					setUnsaved(true);
+				}} />
+			</div>
 		</div>
 		<div className="w-full h-full flex flex-col space-y-2">
 			<label className={commonStyles.management.subtitle}>Categories:</label>
