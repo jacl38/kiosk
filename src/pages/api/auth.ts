@@ -111,7 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					// Generate session token and hand it to client to store as cookie
 					// Cookie expires in {sessionTimeout} seconds
 					const sessionToken = hash(`${Date.now()}${request.credentials.password}`);
-					setCookie("token", sessionToken, { req, res, maxAge: sessionTimeout, secure: process.env.NODE_ENV !== "development" });
+					setCookie("token", sessionToken, { req, res, maxAge: sessionTimeout, secure: process.env.NODE_ENV !== "development", httpOnly: true });
 
 					// Update the admin account in the database with the new values
 					// for adminLastLogin and adminToken

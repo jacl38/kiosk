@@ -27,7 +27,7 @@ const styles = {
 		)
 	},
 	newButton: tw(
-		`absolute left-1/2 -translate-x-1/2`,
+		`relative mx-auto my-12`,
 		`w-12 h-12`,
 		`bg-stone-100 dark:bg-gray-600`,
 		`rounded-full`,
@@ -71,6 +71,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	useEffect(() => {
 		function hashChange() {
 			if(window.location.hash === "" || window.location.hash === "#d") {
+				window.location.hash = "";
 				menu.reFetch();
 			}
 		}

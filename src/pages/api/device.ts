@@ -103,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 						// Create a new token and issue it to the client
 						const newToken = hash(`${new Date()}${lowestUnusedDeviceID}`);
-						setCookie("device-token", newToken, { req, res, secure: process.env.NODE_ENV !== "development" });
+						setCookie("device-token", newToken, { req, res, secure: process.env.NODE_ENV !== "development", httpOnly: true });
 
 						const info: DeviceInfo = {
 							id: lowestUnusedDeviceID,

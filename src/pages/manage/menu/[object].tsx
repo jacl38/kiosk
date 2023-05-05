@@ -68,8 +68,8 @@ export default function Object() {
 	}
 
 	async function saveObject() {
-		if(!modifiedData || !modifiedData._id) return;
-		await menu.modifyObject(modifiedData._id, modifiedData);
+		if(!modifiedData || !modifiedData._id || !objectData?._id) return;
+		await menu.modifyObject(objectData?._id, modifiedData);
 		setUnsaved(false);
 		menu.reFetch();
 	}

@@ -75,9 +75,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						delete request.modifiedObject._id;
 
 						const objectCollection = await getCollectionByType(request.modifiedObject.type);
-						const result = await objectCollection.replaceOne({
-							$where() { return this._id === request.id } },
-							request.modifiedObject);
+
+						const result = await objectCollection.updateOne(
+							{ _id: new ObjectId(request.id) },
+							{ $set: request.modifiedObject },
+							{ upsert: false }
+						);
 
 						if(result.acknowledged) {
 							res.status(200).send({ message: `Modified ${result.modifiedCount} from ${request.modifiedObject.type}` });
