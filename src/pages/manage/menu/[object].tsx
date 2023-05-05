@@ -33,8 +33,8 @@ export default function Object() {
 	const router = useRouter();
 	const objectType = router.query.object as "category" | "item" | "addon" | undefined;
 
-	const [objectData, setObjectData] = useState<Category | Item | Addon>();
-	const [modifiedData, setModifiedData] = useState<Category | Item | Addon>();
+	const [objectData, setObjectData] = useState<Category | (Item & { imageData?: string }) | Addon>();
+	const [modifiedData, setModifiedData] = useState<Category | (Item & { imageData?: string }) | Addon>();
 	const { id } = router.query;
 	const menu = useMenu(true);
 

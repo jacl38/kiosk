@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { query } from "./auth";
 import { getAddons, getCategories, getItems, getMenu } from "@/menu/menuUtil";
 import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName, Settings, SettingsCollectionName } from "@/menu/structures";
-import { ObjectId } from "mongodb";
+import { Binary, ObjectId } from "mongodb";
 import getCollection from "./db";
 
 export type MenuIntent = "get" | "add" | "remove" | "modify" | "getsettings" | "modifysettings";
@@ -18,7 +18,7 @@ export type MenuRequest = {
 } | {
 	intent: "modify",
 	id: ObjectId,
-	modifiedObject: Category | Item | Addon
+	modifiedObject: Category | (Item & { imageData?: string }) | Addon
 } | {
 	intent: "getsettings"
 } | {
@@ -75,6 +75,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						delete request.modifiedObject._id;
 
 						const objectCollection = await getCollectionByType(request.modifiedObject.type);
+
+						if(request.modifiedObject.type == "Item") {
+							const imageCollection = await getCollection("MenuImages");
+							const existingItem = await objectCollection.findOne({ _id: new ObjectId(request.id) });
+							const imgId = existingItem?.imageID;
+
+							if(request.modifiedObject.imageData && request.modifiedObject.imageData.length !== 0) {
+								if(imgId) {
+									await imageCollection.updateOne(
+										{ _id: new ObjectId(imgId) },
+										{ $set: { data: request.modifiedObject.imageData } },
+										{ upsert: false }
+									);
+								} else {
+									const imageUpload = await imageCollection.insertOne({ data: request.modifiedObject.imageData });
+									request.modifiedObject.imageID = imageUpload.insertedId;
+								}
+							} else {
+								await imageCollection.deleteOne({ _id: new ObjectId(imgId) });
+								request.modifiedObject.imageID = undefined;
+							}
+
+							delete request.modifiedObject.imageData;
+						}
 
 						const result = await objectCollection.updateOne(
 							{ _id: new ObjectId(request.id) },

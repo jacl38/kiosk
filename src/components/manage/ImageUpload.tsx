@@ -27,12 +27,20 @@ const styles = {
 		`group-hover:opacity-50 group-hover:saturate-50 group-hover:blur-sm`,
 		`opacity-100 saturate-100 blur-0`,
 		`transition-all`,
+	),
+	removeButton: tw(
+		`absolute bottom-0 w-full`,
+		`group-hover:h-8 h-0`,
+		`bg-red-500 bg-opacity-25`,
+		`font-bold`,
+		`rounded-t-lg`,
+		`transition-all`
 	)
 }
 
 type ImageUploadProps = {
 	keyId: string
-	onUpload?: (buffer: ArrayBuffer) => void,
+	onUpload?: (image64: string) => void,
 	maxBytes?: number
 }
 
@@ -40,7 +48,7 @@ type ImageUploadProps = {
 const tenMegabytes = 10 * 1024 * 1024;
 
 export default function ImageUpload(props: ImageUploadProps) {
-	const [image, setImage] = useState<ArrayBuffer>();
+	const [image64, setImage64] = useState<string>();
 	const [url, setUrl] = useState<string>();
 
 	function uploadImage(e: ChangeEvent<HTMLInputElement>) {
@@ -58,22 +66,37 @@ export default function ImageUpload(props: ImageUploadProps) {
 		return alert(`Image is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). Max file size is 10 MB.`);
 
 		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
 
+		reader.readAsDataURL(file);
 		reader.onload = e => {
-			const img = e.target?.result as ArrayBuffer;
-			const bufferView = new Uint8Array(img);
-			const blob = new Blob([bufferView], { type: "image/jpeg" });
-			const urlCreator = window.URL || window.webkitURL;
-			const imageUrl = urlCreator.createObjectURL(blob);
-			setUrl(imageUrl);
-			setImage(e.target?.result as ArrayBuffer);
+			const img64 = e.target?.result as string;
+			setImage64(img64);
+
+			props.onUpload?.(img64);
+
+			reader.readAsArrayBuffer(file);
+	
+			reader.onload = e => {
+				const img = e.target?.result as ArrayBuffer;
+				const bufferView = new Uint8Array(img);
+				const blob = new Blob([bufferView], { type: "image/jpeg" });
+				const urlCreator = window.URL || window.webkitURL;
+				const imageUrl = urlCreator.createObjectURL(blob);
+				setUrl(imageUrl);
+			}
 		}
+	}
+
+	function removeImage() {
+		setImage64(undefined);
+		setUrl(undefined);
+		props.onUpload?.("");
 	}
 	
 	return <div className={styles.outerContainer}>
 		<img className={styles.img} src={url}></img>
 		<label className={styles.label} htmlFor={props.keyId}>Pick an image</label>
 		<input accept="image/png, image/jpeg" onChange={uploadImage} hidden id={props.keyId} type="file" />
+		<button onClick={removeImage} className={styles.removeButton}>Remove</button>
 	</div>
 }

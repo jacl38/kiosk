@@ -9,7 +9,7 @@ import { ObjectId } from "mongodb";
 import useMenu from "@/hooks/useMenu";
 import ImageUpload from "../ImageUpload";
 
-export default function ItemEdit(props: Item & { onChange: (item: Item) => void }) {
+export default function ItemEdit(props: Item & { onChange: (item: Item & { imageData?: string }) => void }) {
 
 	const nameInput = useRef<HTMLInputElement>(null);
 	const descriptionInput = useRef<HTMLTextAreaElement>(null);
@@ -24,6 +24,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item) => void 
 
 	const [selectedCategories, setSelectedCategories] = useState<ObjectId[]>(props.categoryIDs);
 	const [selectedAddons, setSelectedAddons] = useState<ObjectId[]>(props.addons.map(a => a.id));
+	const [imageData, setImageData] = useState<string>();
 
 	useEffect(() => {
 		const newItem: Item = {
@@ -38,8 +39,8 @@ export default function ItemEdit(props: Item & { onChange: (item: Item) => void 
 			})),
 			categoryIDs: selectedCategories
 		}
-		props.onChange?.(newItem);
-	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons]);
+		props.onChange?.({...newItem, imageData });
+	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData]);
 
 	const menu = useMenu(true);
 
@@ -89,10 +90,10 @@ export default function ItemEdit(props: Item & { onChange: (item: Item) => void 
 				</div>
 
 			</div>
-			{/* <label>Upload an image</label> */}
-			{/* <input onChange={uploadImage} id="image-upload" type="file" accept="image/png, image/jpeg" /> */}
-			<ImageUpload keyId="item-image" />
-			{/* <img className={image ? "" : "hidden"} ></img> */}
+			<ImageUpload keyId="item-image" onUpload={imageData => {
+				setImageData(imageData);
+				setUnsaved(true);
+			}} />
 		</div>
 		<div className="w-full h-full flex flex-col space-y-2">
 			<label className={commonStyles.management.subtitle}>Categories:</label>

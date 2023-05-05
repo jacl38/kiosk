@@ -54,7 +54,7 @@ export default function useMenu(admin: boolean) {
 		});
 	}
 
-	async function modifyObject(id: ObjectId, modifiedObject: Category | Item | Addon) {
+	async function modifyObject(id: ObjectId, modifiedObject: Category | (Item & { imageData?: string }) | Addon) {
 		if(!admin) return;
 		const request: MenuRequest = { intent: "modify", id, modifiedObject };
 
