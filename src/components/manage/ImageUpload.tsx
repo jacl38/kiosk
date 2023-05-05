@@ -45,8 +45,8 @@ type ImageUploadProps = {
 	maxBytes?: number
 }
 
-/** Ten megabytes (in bytes) */
-const tenMegabytes = 10 * 1024 * 1024;
+/** Max upload size (in bytes) */
+const maxUpload = 4 * 1024 * 1024;
 
 export default function ImageUpload(props: ImageUploadProps) {
 	const [image64, setImage64] = useState<string | undefined>();
@@ -63,8 +63,8 @@ export default function ImageUpload(props: ImageUploadProps) {
 			return alert("Please choose a .jpg or .png image file.");
 		
 		// If file size is too large
-		if(file.size > (props.maxBytes ?? tenMegabytes))
-		return alert(`Image is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). Max file size is 10 MB.`);
+		if(file.size > (props.maxBytes ?? maxUpload))
+		return alert(`Image is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). Max file size is ${(maxUpload / 1024 / 1024).toFixed(1)} MB.`);
 
 		const reader = new FileReader();
 

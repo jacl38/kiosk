@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse, PageConfig } from "next";
 import { query } from "./auth";
 import { getAddons, getCategories, getImages, getItems, getMenu } from "@/menu/menuUtil";
 import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName, Settings, SettingsCollectionName } from "@/menu/structures";
 import { Binary, ObjectId } from "mongodb";
 import getCollection from "./db";
+import sharp from "sharp";
 
 export type MenuIntent = "get" | "add" | "remove" | "modify" | "getsettings" | "modifysettings";
 export type MenuRequest = {
@@ -31,6 +32,15 @@ function getCollectionByType(type: "Category" | "Item" | "Addon") {
 		case "Category": return getCollection(CategoryCollectionName);
 		case "Item": return getCollection(ItemCollectionName);
 		case "Addon": return getCollection(AddonCollectionName);
+	}
+}
+
+const config: PageConfig = {
+	api: {
+		responseLimit: false,
+		bodyParser: {
+			sizeLimit: '5mb'
+		}
 	}
 }
 
@@ -83,14 +93,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 							const imgId = existingItem?.imageID;
 
 							if(request.modifiedObject.imageData && request.modifiedObject.imageData.length !== 0) {
+
+								// const formatted = request.modifiedObject.imageData.replace(/data:image\/(png|jpeg|jpg);base64,/gi, "");
+								// const buffer = Buffer.from(request.modifiedObject.imageData, "base64");
+								// console.log(buffer.byteLength);
+
+								const parts = request.modifiedObject.imageData.split(";");
+								const mimeType = parts[0].split(":")[1];
+								const imageData = parts[1].split(",")[1];
+
+								const buffer = Buffer.from(imageData, "base64");
+
+								console.log(buffer.byteLength);
+
+								const compressed = sharp(buffer)
+									.resize({
+										width: 200,
+										height: 200,
+										fit: "inside"
+									});
+								
+								const compressed64 = `data:${mimeType};base64,${(await (compressed.toBuffer())).toString("base64")}`;
+
+								console.log(compressed64.length);
+
 								if(imgId) {
 									await imageCollection.updateOne(
 										{ _id: new ObjectId(imgId) },
-										{ $set: { data: request.modifiedObject.imageData } },
+										{ $set: { data: compressed64 } },
 										{ upsert: false }
 									);
 								} else {
-									const imageUpload = await imageCollection.insertOne({ data: request.modifiedObject.imageData });
+									const imageUpload = await imageCollection.insertOne({ data: compressed64 });
 									request.modifiedObject.imageID = imageUpload.insertedId;
 								}
 							} else {
