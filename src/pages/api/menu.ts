@@ -35,7 +35,7 @@ function getCollectionByType(type: "Category" | "Item" | "Addon") {
 	}
 }
 
-const config: PageConfig = {
+export const config: PageConfig = {
 	api: {
 		responseLimit: false,
 		bodyParser: {
@@ -94,28 +94,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 							if(request.modifiedObject.imageData && request.modifiedObject.imageData.length !== 0) {
 
-								// const formatted = request.modifiedObject.imageData.replace(/data:image\/(png|jpeg|jpg);base64,/gi, "");
-								// const buffer = Buffer.from(request.modifiedObject.imageData, "base64");
-								// console.log(buffer.byteLength);
-
 								const parts = request.modifiedObject.imageData.split(";");
 								const mimeType = parts[0].split(":")[1];
 								const imageData = parts[1].split(",")[1];
 
 								const buffer = Buffer.from(imageData, "base64");
 
-								console.log(buffer.byteLength);
-
 								const compressed = sharp(buffer)
 									.resize({
-										width: 200,
-										height: 200,
+										width: 360,
+										height: 360,
 										fit: "inside"
+									})
+									.jpeg({
+										quality: 90,
+										force: true
 									});
 								
 								const compressed64 = `data:${mimeType};base64,${(await (compressed.toBuffer())).toString("base64")}`;
-
-								console.log(compressed64.length);
 
 								if(imgId) {
 									await imageCollection.updateOne(
