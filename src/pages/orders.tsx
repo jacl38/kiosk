@@ -1,4 +1,4 @@
 
-export default function Order() {
+export default function Orders() {
 	return <p>Orders</p>
 }

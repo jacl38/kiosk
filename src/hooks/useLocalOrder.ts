@@ -2,6 +2,7 @@ import { Order, OrderPart } from "@/menu/structures";
 import useLocalStorage from "./useLocalStorage";
 import { lowestMissingValue } from "@/utility/mathUtil";
 import postRequest from "@/utility/netUtil";
+import * as orderUtil from "@/utility/orderUtil";
 
 export default function useLocalOrder() {
 	const [current, setCurrent] = useLocalStorage("current-order", {
@@ -13,47 +14,26 @@ export default function useLocalOrder() {
 	} as Order);
 
 	function addPart(part: OrderPart) {
-		setCurrent(o => {
-			const lowestMissingPartID = lowestMissingValue(o.parts.map(p => p.partID));
-			return {
-				...o,
-				parts: [...o.parts, {...part, partID: lowestMissingPartID}]
-			}
-		});
+		setCurrent(o => orderUtil.addPart(o, part));
 	}
 
 	function removePart(partID: number) {
-		setCurrent(o => ({
-			...o,
-			parts: o.parts.filter(p => p.partID !== partID)
-		}));
+		setCurrent(o => orderUtil.removePart(o, partID));
 	}
 
 	function changePart(partID: number, changedPart: Partial<OrderPart>) {
-		setCurrent(o => ({
-			...o,
-			parts: o.parts.map(p => {
-				if(p.partID === partID) {
-					return {
-						...p,
-						...changedPart,
-						partID: partID
-					}
-				}
-				return p;
-			})
-		}));
+		setCurrent(o => orderUtil.changePart(o, partID, changedPart));
 	}
 
 	function setPersonalInfo(info: { name: string, notes: string, phone: string }) {
-		setCurrent(o => ({ ...o, ...info }));
+		setCurrent(o => orderUtil.setPersonalInfo(o, info));
 	}
 
 	async function finalizeOrder() {
 		const request/*: OrderRequest = { intent: "order", order: current }; */ = {  };
 
 		await postRequest("order", request, async response => {
-			
+
 		});
 	}
 
