@@ -261,6 +261,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 					{
 						withLoading(!menu.settingsLoaded,
 							<TextConfirmField
+								label="Tax Rate" suffix="%"
 								onSubmit={v => {
 									if(menu.settings) {
 										menu.modifySettings({...menu.settings, taxRate: parseFloat(v)});
@@ -273,10 +274,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 										}
 									},
 									placeholder: `${menu.settings?.taxRate ?? 0}`
-								}
-							}
-							label="Tax Rate"
-							suffix="%" />
+								}}
+							/>
 						)
 					}
 				</div>
@@ -284,7 +283,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 			<List>
 				{
-					(getRenderList()?.length ?? 0) > 0
+					getRenderList()?.length
 					? withLoading(!menu.menuLoaded,
 						getRenderList()?.map((object, i) => {
 							return <ListItem key={i}
@@ -301,8 +300,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 									<span className={commonStyles.management.menu.list.arrow}></span>
 								</div>
 							</ListItem>
-						})
-					) : <ListItem>
+						}))
+					: <ListItem>
 						<div className="flex flex-col justify-between h-full p-3">
 							<p className="font-bold">No {tab.label} found.</p>
 							<p>Click the button below to get started.</p>

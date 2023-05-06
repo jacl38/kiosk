@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					// If the connecting client is already authenticated as administrator,
 					// allow pairing without setting up as a new device
 					if(authenticated) {
-						res.status(200).send({ id: 0 });
+						res.status(200).send({ id: 0, name: "Management Device" });
 						return;
 					}
 
@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						}
 
 						const deviceID = foundDevice?.id;
-						res.status(200).send({ id: deviceID });
+						res.status(200).send({ id: deviceID, name: foundDevice?.name });
 						return;
 					}
 
