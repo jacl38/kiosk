@@ -12,7 +12,7 @@ export interface Item extends IBuyable {
 	imageID?: ObjectId,
 	description: string,
 	categoryIDs: ObjectId[],
-	addons: { id: ObjectId, enabled: boolean }[]
+	addonIDs: ObjectId[]
 }
 
 export const AddonCollectionName = "MenuAddon";

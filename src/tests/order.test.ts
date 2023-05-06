@@ -13,19 +13,19 @@ const testItems: Partial<Item>[] = [
 		_id: new ObjectId(0),
 		name: "Test Item A",
 		price: 1.23,
-		addons: testAddons.map(a => ({id: a._id, enabled: true}))
+		addonIDs: testAddons.map(a => a._id)
 	},
 	{
 		_id: new ObjectId(1),
 		name: "Test Item B",
 		price: 4.56,
-		addons: testAddons.map(a => ({id: a._id, enabled: true}))
+		addonIDs: testAddons.map(a => a._id)
 	},
 	{
 		_id: new ObjectId(2),
 		name: "Test Item C",
 		price: 7.89,
-		addons: testAddons.map(a => ({id: a._id, enabled: true}))
+		addonIDs: testAddons.map(a => a._id)
 	}
 ];
 
@@ -34,5 +34,5 @@ const testOrder: Partial<Order> = {
 }
 
 describe("Order operations", () => {
-	
+
 });

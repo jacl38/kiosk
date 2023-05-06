@@ -21,7 +21,7 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 			price: addonPrice || props.price
 		}
 		props.onChange?.(newAddon);
-	}, [addonName, addonPrice, props]);
+	}, [addonName, addonPrice]);
 
 	return <div className="flex space-x-2">
 		<div className="w-full">

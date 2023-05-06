@@ -22,7 +22,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 	const [itemDescription, setItemDescription] = useState(props.description);
 
 	const [selectedCategories, setSelectedCategories] = useState<ObjectId[]>(props.categoryIDs);
-	const [selectedAddons, setSelectedAddons] = useState<ObjectId[]>(props.addons.map(a => a.id));
+	const [selectedAddons, setSelectedAddons] = useState<ObjectId[]>(props.addonIDs ?? []);
 	const [imageData, setImageData] = useState<string | undefined>();
 
 	useEffect(() => {
@@ -32,14 +32,11 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 			name: itemName || props.name,
 			price: itemPrice || props.price,
 			description: itemDescription || props.description,
-			addons: selectedAddons.map(a => ({
-				id: a,
-				enabled: false
-			})),
+			addonIDs: selectedAddons,
 			categoryIDs: selectedCategories
 		}
 		props.onChange?.({...newItem, imageData });
-	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData, props]);
+	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData]);
 
 	const menu = useMenu(true);
 
