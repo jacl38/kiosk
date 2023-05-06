@@ -29,6 +29,7 @@
     "vercel": "^28.20.0"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^4.1.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "jest": "^29.5.0",

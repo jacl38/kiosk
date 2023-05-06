@@ -11,7 +11,8 @@ const customJestConfig = {
 		'^@/components/(.*)$': '<rootDir>/components/$1',
 		'^@/pages/(.*)$': '<rootDir>/pages/$1'
 	},
-	testEnvironment: 'jest-environment-jsdom'
+	testEnvironment: './src/tests/env.js',
+	preset: "@shelf/jest-mongodb"
 }
 
 module.exports = createJestConfig(customJestConfig);
