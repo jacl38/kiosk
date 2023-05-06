@@ -34,7 +34,7 @@ export type Category = {
 }
 
 export type OrderPart = {
-	partID: number,
+	partID?: number,
 	itemID: ObjectId,
 	quantity: number,
 	addonIDs: ObjectId[],

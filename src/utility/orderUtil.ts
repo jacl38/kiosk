@@ -2,7 +2,7 @@ import { Order, OrderPart } from "@/menu/structures";
 import { lowestMissingValue } from "./mathUtil";
 
 export function addPart(order: Order, part: OrderPart): Order {
-	const lowestMissingPartID = lowestMissingValue(order.parts.map(p => p.partID));
+	const lowestMissingPartID = lowestMissingValue(order.parts.map(p => p.partID ?? 0));
 	return {
 		...order,
 		parts: [...order.parts, {...part, partID: lowestMissingPartID} ]
