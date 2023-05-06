@@ -27,7 +27,7 @@ export default function usePair(type: DeviceType, then?: (paired: boolean) => vo
 				}
 			});
 		})();
-	}, []);
+	}, [type]);
 
 	return { id, paired };
 }

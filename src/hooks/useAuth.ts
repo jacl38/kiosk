@@ -1,7 +1,7 @@
 import { AuthRequest } from "@/pages/api/auth";
 import postRequest from "@/utility/netUtil";
 import { useRouter, Router } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /** Hook used to provide admin login authentication for a page/component.
 Returns authentication state and admin account creation status */
@@ -11,11 +11,15 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 	// Default action to take if authentication is invalid
 	// If admin account exists, route to login with redirect back to current route
 	// If admin account does not exist, route user to main page where admin account creation can begin
-	const defaultThen = then ?? ((valid: boolean, hasAdminAccount: boolean) => {
+	const defaultThen = useCallback((valid: boolean, hasAdminAccount: boolean) => {
+		if(then) {
+			then(valid, hasAdminAccount);
+			return;
+		}
 		if(!valid) {
 			router.push(hasAdminAccount ? `/login?redirect=${window.location.pathname}` : "/");
 		}
-	});
+	}, [router, then]);
 
 	// Stateful variables to store whether authentication is successful and admin account is found
 	// Both start at "unknown"
@@ -41,7 +45,7 @@ export default function useAuth(then?: (authenticated: boolean, hasAdminAccount:
 				defaultThen(content.authenticated, content.hasAdminAccount);
 			});
 		})();
-	}, []);
+	}, [defaultThen]);
 
 	return { authenticated, hasAdminAccount };
 }

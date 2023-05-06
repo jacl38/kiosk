@@ -77,7 +77,7 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 			router.push("manage/menu/category");
 		}
 		setTabRoute(route as keyof typeof tabs);
-	}, [router.pathname]);
+	}, [router]);
 
 	return <div className={commonStyles.management.outerContainer}>
 		{

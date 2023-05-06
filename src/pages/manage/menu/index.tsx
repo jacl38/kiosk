@@ -127,7 +127,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 		window.addEventListener("hashchange", hashChange);
 		return () => window.removeEventListener("hashchange", hashChange);
-	}, [router.query]);
+	}, [router.query, menu, router]);
 
 	function getRenderList() {
 		let allCategoryObjects = menu.menu?.[selectedTab ?? "category"];
@@ -231,7 +231,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 									{
 										Object.keys(sortModes).map(mode => {
 											const sortMode = sortModes[mode as keyof typeof sortModes];
-											return <option value={mode} selected={selectedSortMode === mode}>{sortMode.label}</option>
+											return <option key={mode} value={mode} selected={selectedSortMode === mode}>{sortMode.label}</option>
 										})
 									}
 								</select>

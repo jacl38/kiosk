@@ -21,7 +21,7 @@ export default function CategoryEdit(props: Category & { onChange: (category: Ca
 			description: categoryDescription || props.description
 		}
 		props.onChange?.(newCategory);
-	}, [categoryName, categoryDescription]);
+	}, [categoryName, categoryDescription, props]);
 
 	return <div className="flex flex-col space-y-4">
 		<div className="flex flex-col">

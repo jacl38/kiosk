@@ -39,7 +39,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 			categoryIDs: selectedCategories
 		}
 		props.onChange?.({...newItem, imageData });
-	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData]);
+	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData, props]);
 
 	const menu = useMenu(true);
 
@@ -48,7 +48,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 			const foundImage = menu.images?.find(i => i._id === props.imageID);
 			setImageData(foundImage?.data);
 		}
-	}, [menu.menuLoaded]);
+	}, [menu.menuLoaded, menu.images, props.imageID]);
 
 	return <div className="flex h-full max-xl:flex-col xl:space-x-2 max-xl:space-y-4 justify-between">
 		<div>

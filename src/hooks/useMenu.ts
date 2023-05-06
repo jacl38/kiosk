@@ -3,7 +3,7 @@ import { Addon, Category, Item, Settings } from "@/menu/structures";
 import { MenuRequest } from "@/pages/api/menu";
 import postRequest from "@/utility/netUtil";
 import { ObjectId } from "mongodb";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function useMenu(admin: boolean) {
 	const [menu, setMenu] = useState<Menu>();
@@ -13,7 +13,7 @@ export default function useMenu(admin: boolean) {
 	const [settings, setSettings] = useState<Settings>();
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
 
-	async function reFetch() {		
+	const reFetch = useCallback(async () => {		
 		await postRequest("menu", { intent: "get" }, async response => {
 			if(response.status === 200) {
 				const body = await response.json();
@@ -32,11 +32,11 @@ export default function useMenu(admin: boolean) {
 				}
 			});
 		}
-	}
+	}, [admin]);
 
 	useEffect(() => {
 		reFetch();
-	}, []);
+	}, [reFetch]);
 
 	async function addObject(object: Category | Item | Addon) {
 		if(!admin) return;

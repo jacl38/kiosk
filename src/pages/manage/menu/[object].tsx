@@ -47,7 +47,7 @@ export default function Object() {
 		const foundObject = (menu.menu?.[objectType] as any[]).find(i => i?._id.toString() === id);
 
 		setObjectData(foundObject);
-	}, [menu.menu, router.query]);
+	}, [menu.menu, menu.menuLoaded, router, id, objectType]);
 
 	function selectMessage() {
 		switch (objectType) {
