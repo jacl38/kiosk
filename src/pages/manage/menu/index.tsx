@@ -164,7 +164,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 						price: 0.00,
 						name: "New item",
 						description: "Item description",
-						addons: [],
+						addonIDs: [],
 						categoryIDs: []
 					}
 					break;
