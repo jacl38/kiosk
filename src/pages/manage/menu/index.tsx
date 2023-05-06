@@ -268,8 +268,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 								}}
 								inputProps={{
 									onBlur: e => {
-										if(menu.settings) {
-											menu.modifySettings({...menu.settings, taxRate: parseFloat(e.target.value ?? 0)});
+										if(menu.settings && e.target.value !== "") {
+											menu.modifySettings({...menu.settings, taxRate: parseFloat(e.target.value)});
 										}
 									},
 									placeholder: `${menu.settings?.taxRate ?? 0}`

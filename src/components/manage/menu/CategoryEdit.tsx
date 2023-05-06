@@ -13,15 +13,16 @@ export default function CategoryEdit(props: Category & { onChange: (category: Ca
 	const [categoryName, setCategoryName] = useState(props.name);
 	const [categoryDescription, setCategoryDescription] = useState(props.description);
 
+	const { _id, name, description, onChange } = props;
+
 	useEffect(() => {
 		const newCategory: Category = {
-			type: "Category",
-			_id: props._id,
-			name: categoryName || props.name,
-			description: categoryDescription || props.description
+			type: "Category", _id,
+			name: categoryName || name,
+			description: categoryDescription || description
 		}
-		props.onChange?.(newCategory);
-	}, [categoryName, categoryDescription, props]);
+		onChange(newCategory);
+	}, [categoryName, categoryDescription, onChange, _id, name, description]);
 
 	return <div className="flex flex-col space-y-4">
 		<div className="flex flex-col">
