@@ -119,14 +119,15 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	useEffect(() => {
 		function hashChange() {
 			if(window.location.hash === "" || window.location.hash === "#d") {
-				window.location.hash = "";
 				menu.reFetch();
+				setSelectedObjectId(undefined);
+				router.push(`/manage/menu/${router.query.object}`);
 			}
 		}
 
 		window.addEventListener("hashchange", hashChange);
 		return () => window.removeEventListener("hashchange", hashChange);
-	}, []);
+	}, [router.query]);
 
 	function getRenderList() {
 		let allCategoryObjects = menu.menu?.[selectedTab ?? "category"];
