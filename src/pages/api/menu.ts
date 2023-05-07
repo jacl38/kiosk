@@ -72,6 +72,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					if(authorized) {
 						const objectCollection = await getCollectionByType(request.type);
 
+						if(request.type === "Item") {
+							const existingItem = await objectCollection.findOne({ _id: new ObjectId(request.id) });
+							const imgId = existingItem?.imageID;
+
+							if(imgId) {
+								const imageCollection = await getCollection("MenuImages");
+								imageCollection.deleteOne({ _id: new ObjectId(imgId) });
+							}
+						}
+
 						const result = await objectCollection.deleteOne({ _id: new ObjectId(request.id) });
 
 						if(result.acknowledged) {
