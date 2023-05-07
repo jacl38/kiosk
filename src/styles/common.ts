@@ -164,7 +164,18 @@ const commonStyles = {
 		`after:border-8 after:border-t-transparent after:dark:border-t-transparent`,
 		`after:border-stone-400 after:dark:border-gray-500`,
 		`after:animate-spin`,
-	)
+	),
+	order: {
+		button: tw(
+			`bg-emerald-700`,
+			`py-1.5 px-4`,
+			`font-bold text-white`,
+			`rounded-full`,
+			`border-b-4 border-emerald-800`,
+			`hover:border-b-2`,
+			`transition-all`
+		)
+	}
 }
 
 export default commonStyles;
