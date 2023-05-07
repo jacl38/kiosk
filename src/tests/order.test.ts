@@ -2,8 +2,6 @@ import { Addon, Item, Order } from "@/menu/structures";
 import { ObjectId } from "mongodb";
 import '@testing-library/jest-dom';
 import { addPart, changePart, removePart, setPersonalInfo } from "@/utility/orderUtil";
-import { experimental_useEffectEvent } from "react";
-import { parseIsolatedEntityName } from "typescript";
 
 const testAddons: (Partial<Addon> & { _id: ObjectId })[] = [
 	{ _id: new ObjectId(0), name: "Test Addon A", price: 0.49 },
