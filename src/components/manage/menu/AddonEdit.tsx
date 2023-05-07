@@ -18,7 +18,7 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 			type: "Addon",
 			_id: props._id,
 			name: addonName || props.name,
-			price: addonPrice || props.price
+			price: addonPrice ?? props.price
 		}
 		props.onChange?.(newAddon);
 	}, [addonName, addonPrice]);

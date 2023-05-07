@@ -30,7 +30,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 			type: "Item",
 			_id: props._id,
 			name: itemName || props.name,
-			price: itemPrice || props.price,
+			price: itemPrice ?? props.price,
 			description: itemDescription || props.description,
 			addonIDs: selectedAddons,
 			categoryIDs: selectedCategories
