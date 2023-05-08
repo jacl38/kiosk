@@ -1,13 +1,14 @@
 import { tw } from "@/utility/tailwindUtil"
 import { AnimatePresence, motion } from "framer-motion"
-import { MouseEvent, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 
 const styles = {
 	outerContainer: tw(
 		`overflow-x-scroll overflow-hidden`,
-		`flex items-center`,
+		`flex flex-auto items-center`,
 		`h-16`,
-		`space-x-4 px-4`
+		`space-x-4 px-4`,
+		`relative`
 	),
 	button: {
 		container: tw(
@@ -15,16 +16,16 @@ const styles = {
 			`bg-emerald-700 bg-opacity-50`,
 			`border-emerald-800 border-opacity-50 border-b-2`,
 			`rounded-full`,
-			`relative z-0`
+			`relative z-0`,
+			`overflow-hidden`
 		),
 		overlay: tw(
 			`absolute inset-0`,
-			`w-full h-full`,
-			`bg-emerald-700`,
-			`rounded-full -z-50`
+			`bg-emerald-700 mix-blend-darken`,
+			`rounded-full -z-10`
 		),
 		label: tw(
-			`font-bold text-white z-50`
+			`font-bold text-white`
 		)
 	}
 }
@@ -41,34 +42,42 @@ type SectionScrollerProps = {
 }
 
 export default function SectionScroller(props: SectionScrollerProps) {
-	const [selectedID, setSelectedID] = useState<any>(props.sections[0].id);
+	const { sections } = props;
+	
+	const [selectedID, setSelectedID] = useState<any>();
+
+	useEffect(() => {
+		if(sections.length === 0 || selectedID) return;
+		setSelectedID((id: any) => id ?? sections[0]?.id);
+		props.onSelect?.(sections[0]?.id);
+	}, [sections]);
 
 	function select(e: MouseEvent) {
+		if(sections.length === 0) return;
 		const elementID = e.currentTarget.id;
 		const sectionID = elementID.split("-").pop();
-		console.log(sectionID);
 		setSelectedID(sectionID);
+		props.onSelect?.(sectionID);
 	}
 
 	return <nav className={styles.outerContainer}>
-			{props.sections.map(section => <button
-				key={`sectionscroller-${props.keyId}-${section.id}`}
-				id={`sectionscroller-${props.keyId}-${section.id}`}
-				onClick={select}
-				className={styles.button.container}>
-				<AnimatePresence>
+		{sections.map(section => <button
+			key={`sectionscroller-${props.keyId}-${section.id}`}
+			id={`sectionscroller-${props.keyId}-${section.id}`}
+			onClick={select}
+			className={styles.button.container}>
+			<span className={styles.button.label}>{section.label}</span>
+			<AnimatePresence>
 				{
 					section.id == selectedID &&
 					<motion.div
-						initial={{ translateY: 50, opacity: 0 }}
-						animate={{ translateY: 0, opacity: 1 }}
-						exit={{ translateY: 50, opacity: 0 }}
-						transition={{ ease: "easeOut" }}
+						initial={{ translateY: 50 }}
+						animate={{ translateY: 0, transition: { ease: "circOut", duration: 0.2 } }}
+						exit={{ translateY: 50 }}
 						className={styles.button.overlay}>
 					</motion.div>
 				}
-				</AnimatePresence>
-				<span className={styles.button.label}>{section.label}</span>
-			</button>)}
+			</AnimatePresence>
+		</button>)}
 	</nav>
 }

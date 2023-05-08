@@ -4,11 +4,8 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "re
 
 const styles = {
 	outerContainer: tw(
-		`h-full flex flex-col`,
 		`bg-hotchocolate-50`,
-	),
-	innerContainer: tw(
-		`flex-auto`
+		`flex-auto`,
 	)
 }
 
@@ -23,9 +20,7 @@ export default function Kiosk(props: { children: ReactNode | ReactNode[] }) {
 	return <div className={styles.outerContainer}>
 		<HeaderContext.Provider value={{ header, setHeader }}>
 			<Header title={header}/>
-			<main className={styles.innerContainer}>
-				{props.children}
-			</main>
+			{props.children}
 		</HeaderContext.Provider>
 	</div>
 }

@@ -6,7 +6,7 @@ export default function Document() {
 			<Head>
 				
 			</Head>
-			<body className="h-full [&>div]:h-full">
+			<body className="h-full [&>div]:h-full [&>div]:flex [&>div]:flex-col">
 				<Main />
 				<NextScript />
 			</body>
