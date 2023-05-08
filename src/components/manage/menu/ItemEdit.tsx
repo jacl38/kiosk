@@ -25,18 +25,26 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 	const [selectedAddons, setSelectedAddons] = useState<ObjectId[]>(props.addonIDs ?? []);
 	const [imageData, setImageData] = useState<string | undefined>();
 
+	const { _id, name, price, description, onChange } = props;
+
 	useEffect(() => {
 		const newItem: Item = {
-			type: "Item",
-			_id: props._id,
-			name: itemName || props.name,
-			price: itemPrice ?? props.price,
-			description: itemDescription || props.description,
+			type: "Item", _id,
+			name: itemName || name,
+			price: itemPrice ?? price,
+			description: itemDescription || description,
 			addonIDs: selectedAddons,
 			categoryIDs: selectedCategories
 		}
-		props.onChange?.({...newItem, imageData });
-	}, [itemName, itemPrice, itemDescription, selectedCategories, selectedAddons, imageData]);
+		onChange({...newItem, imageData });
+	}, [_id,
+		itemName, name,
+		itemPrice, price,
+		itemDescription, description,
+		selectedCategories,
+		selectedAddons,
+		imageData,
+		onChange]);
 
 	const menu = useMenu(true);
 

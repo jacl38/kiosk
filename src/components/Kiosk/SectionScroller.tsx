@@ -42,15 +42,14 @@ type SectionScrollerProps = {
 }
 
 export default function SectionScroller(props: SectionScrollerProps) {
-	const { sections } = props;
-	
+	const { sections, onSelect } = props;
 	const [selectedID, setSelectedID] = useState<any>();
 
 	useEffect(() => {
 		if(sections.length === 0 || selectedID) return;
 		setSelectedID((id: any) => id ?? sections[0]?.id);
-		props.onSelect?.(sections[0]?.id);
-	}, [sections]);
+		onSelect?.(sections[0]?.id);
+	}, [sections, onSelect, selectedID]);
 
 	function select(e: MouseEvent) {
 		if(sections.length === 0) return;

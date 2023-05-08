@@ -22,7 +22,10 @@ export default function CategoryEdit(props: Category & { onChange: (category: Ca
 			description: categoryDescription || description
 		}
 		onChange(newCategory);
-	}, [categoryName, categoryDescription, onChange, _id, name, description]);
+	}, [_id,
+		categoryName, name,
+		categoryDescription, description,
+		onChange]);
 
 	return <div className="flex flex-col space-y-4">
 		<div className="flex flex-col">

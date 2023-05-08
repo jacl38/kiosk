@@ -13,15 +13,19 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 	const [addonName, setAddonName] = useState(props.name);
 	const [addonPrice, setAddonPrice] = useState(props.price);
 
+	const { _id, name, price, onChange } = props;
+
 	useEffect(() => {
 		const newAddon: Addon = {
-			type: "Addon",
-			_id: props._id,
-			name: addonName || props.name,
-			price: addonPrice ?? props.price
+			type: "Addon", _id,
+			name: addonName || name,
+			price: addonPrice ?? price
 		}
-		props.onChange?.(newAddon);
-	}, [addonName, addonPrice]);
+		onChange(newAddon);
+	}, [_id,
+		addonName, name,
+		addonPrice, price,
+		onChange]);
 
 	return <div className="flex space-x-2">
 		<div className="w-full">
