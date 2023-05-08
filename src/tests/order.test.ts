@@ -48,7 +48,7 @@ describe("Order operations", () => {
 			timestamp: 0
 		}
 
-		expect(JSON.stringify(actual)).toBe(JSON.stringify(expected));
+		expect(actual).toEqual(expected);
 	});
 
 	it("Adds Test Item A with Test Addon A to the order", () => {
@@ -77,7 +77,7 @@ describe("Order operations", () => {
 			timestamp: 0
 		}
 
-		expect(JSON.stringify(actual)).toBe(JSON.stringify(expected));
+		expect(actual).toEqual(expected);
 	});
 
 	it("Removes Test Item A from the order", () => {
@@ -96,8 +96,7 @@ describe("Order operations", () => {
 
 		const expected: Order = { name: "", notes: "", phone: "", timestamp: 0, parts: [] }
 		const actual = removePart(testOrder, 1);
-
-		expect(JSON.stringify(actual)).toBe(JSON.stringify(expected));
+		expect(expected).toEqual(actual);
 	});
 
 	it("Sets the quantity of Test Item A to 5", () => {
@@ -127,7 +126,6 @@ describe("Order operations", () => {
 			]
 		}
 		const actual = changePart(testOrder, 1, { quantity: 5 });
-
-		expect(JSON.stringify(expected)).toBe(JSON.stringify(actual));
+		expect(expected).toEqual(actual);
 	});
 });
