@@ -1,4 +1,4 @@
-import { lowestMissingValue } from '@/utility/mathUtil';
+import { clamp, lowestMissingValue, sum } from '@/utility/mathUtil';
 import '@testing-library/jest-dom';
 
 describe("Math operations", () => {
@@ -38,5 +38,38 @@ describe("Math operations", () => {
 			const expected = 6;
 			expect(actual).toBe(expected);
 		});  
+	});
+
+	describe("Clamps", () => {
+		it("Returns input if input is in range", () => {
+			expect(clamp(5, 0, 10)).toBe(5);
+			expect(clamp(0, -10, 10)).toBe(0);
+			expect(clamp(-5, -10, 5)).toBe(-5);
+		});
+
+		it("Returns min value if input is less than min", () => {
+			expect(clamp(-10, 0, 10)).toBe(0);
+			expect(clamp(-20, -10, 10)).toBe(-10);
+			expect(clamp(-10, -5, 5)).toBe(-5);
+		});
+
+		it("Returns max value if input is greater than max", () => {
+			expect(clamp(20, 0, 10)).toBe(10);
+			expect(clamp(20, -10, 10)).toBe(10);
+			expect(clamp(20, -5, 5)).toBe(5);
+		});
+	});
+
+	describe("Array sums", () => {
+		it("Returns the sum of an array of numbers", () => {
+			expect(sum([10, 40, 25])).toBe(75);
+			expect(sum([-4, 7, 2])).toBe(5);
+			expect(sum([-10, -15])).toBe(-25);
+			expect(sum([1])).toBe(1);
+		});
+
+		it("Returns 0 for an empty array", () => {
+			expect(sum([])).toBe(0);
+		});
 	});
 });
