@@ -9,6 +9,7 @@ import ItemCard from "@/components/Kiosk/ItemCard";
 import { ObjectId } from "mongodb";
 import AddToOrderPopup from "@/components/Kiosk/AddToOrderPopup";
 import { Addon, Item } from "@/menu/structures";
+import { AnimatePresence, motion } from "framer-motion";
 
 const styles = {
 	tabBar: tw(
@@ -62,12 +63,9 @@ export default function Menu() {
 	return <>
 		<div className={styles.tabBar}>
 			<SectionScroller
+				loading={!menu.menuLoaded}
 				keyId="categories"
-				sections={
-					menu.menu
-						? menu.menu?.category.map(c => ({ id: c._id, label: c.name }))
-						: []
-				}
+				sections={menu.menu?.category.map(c => ({ id: c._id, label: c.name })) ?? []}
 				onSelect={id => setCategory(id)}
 			/>
 			<div className={styles.checkoutContainer}>
@@ -79,18 +77,26 @@ export default function Menu() {
 			</div>
 		</div>
 
-		<div className={styles.itemGrid}>
-			{itemsWithoutImages?.map(i => {
-				return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i}/>
-			})}
-		</div>
+		<AnimatePresence mode="popLayout">
+			<motion.div
+				initial={{ opacity: 0, translateY: -20 }}
+				animate={{ opacity: 1, translateY: 0, transition: { delay: 0.2 } }}
+				exit={{ opacity: 0, translateY: 20 }}
+				key={category?.toString()}>
+				<div className={styles.itemGrid}>
+					{itemsWithoutImages?.map(i => {
+						return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i}/>
+					})}
+				</div>
 
-		<div className={styles.itemGrid}>
-			{itemsWithImages?.map(i => {
-				return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i} image={getImage(i)?.data}/>
-			})}
-		</div>
-		
+				<div className={styles.itemGrid}>
+					{itemsWithImages?.map(i => {
+						return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i} image={getImage(i)?.data}/>
+					})}
+				</div>
+			</motion.div>
+		</AnimatePresence>
+
 		{
 			selectedItem &&
 			<AddToOrderPopup

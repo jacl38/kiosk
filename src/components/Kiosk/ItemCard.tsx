@@ -12,7 +12,8 @@ const styles = {
 		`rounded-md`,
 		`overflow-hidden`,
 		`relative flex flex-col text-start`,
-		`h-min`
+		`h-min`,
+		`select-none cursor-pointer`
 	),
 	innerContainer: (hasImage: boolean) => tw(
 		hasImage ? `min-h-[6rem]` : `min-h-[4rem]`,
@@ -59,7 +60,7 @@ export default function ItemCard(props: Item & { image?: string, onClick?: () =>
 
 	const hasImage = props.image !== undefined;
 
-	return <motion.button
+	return <motion.div
 		onClick={() => setOpened(o => !o)}
 		className={styles.outerContainer}>
 		<motion.div layoutRoot className={styles.innerContainer(hasImage)}>
@@ -70,16 +71,19 @@ export default function ItemCard(props: Item & { image?: string, onClick?: () =>
 				}
 				<div className={styles.itemInfo.container}>
 					<span className={styles.itemInfo.name}>{props.name}</span>
-					{
-						opened &&
-						<motion.div
-							layout="position"
-							className={styles.itemInfo.description}
-							initial={{ opacity: 0, translateY: 5 }}
-							animate={{ opacity: 1, translateY: 0, transition: { duration: 0.25 } }}>
-							{props.description}
-						</motion.div>
-					}
+					<AnimatePresence>
+						{
+							opened &&
+							<motion.div
+								layout="position"
+								className={styles.itemInfo.description}
+								initial={{ opacity: 0, translateY: -5 }}
+								animate={{ opacity: 1, translateY: 0, transition: { duration: 0.25 } }}
+								exit={{ opacity: 0, translateY: -5 }}>
+								{props.description}
+							</motion.div>
+						}
+					</AnimatePresence>
 				</div>
 			</div>
 			<AnimatePresence>
@@ -96,5 +100,5 @@ export default function ItemCard(props: Item & { image?: string, onClick?: () =>
 			</AnimatePresence>
 		</motion.div>
 		<span className={styles.itemInfo.price(opened, hasImage)}>{formatMoney(props.price)}</span>
-	</motion.button>
+	</motion.div>
 }

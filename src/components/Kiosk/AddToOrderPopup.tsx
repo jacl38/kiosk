@@ -119,8 +119,10 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 		return props.selectedItem.price + addonTotal;
 	}
 
-	return <div onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }} className={styles.backdrop}>
-		<motion.div onClick={e => e.stopPropagation()}
+	return <div
+		onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }}
+		className={styles.backdrop}>
+		<motion.div
 			initial={{ opacity: 0, translateY: 40, scale: 0.8, height: 0 }}
 			animate={{ opacity: 1, translateY: 0, scale: 1, height: "auto"}}
 			className={styles.outerContainer}>

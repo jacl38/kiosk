@@ -26,6 +26,9 @@ const styles = {
 		),
 		label: tw(
 			`font-bold text-white`
+		),
+		skeleton: tw(
+			`px-8 animate-pulse`
 		)
 	}
 }
@@ -38,6 +41,7 @@ type Section = {
 type SectionScrollerProps = {
 	sections: Section[],
 	keyId: string,
+	loading?: boolean,
 	onSelect?: (id: any) => void
 }
 
@@ -60,23 +64,33 @@ export default function SectionScroller(props: SectionScrollerProps) {
 	}
 
 	return <nav className={styles.outerContainer}>
-		{sections.map(section => <button
-			key={`sectionscroller-${props.keyId}-${section.id}`}
-			id={`sectionscroller-${props.keyId}-${section.id}`}
-			onClick={select}
-			className={styles.button.container}>
-			<span className={styles.button.label}>{section.label}</span>
-			<AnimatePresence>
-				{
-					section.id == selectedID &&
-					<motion.div
-						initial={{ translateY: 50 }}
-						animate={{ translateY: 0, transition: { ease: "circOut", duration: 0.2 } }}
-						exit={{ translateY: 50 }}
-						className={styles.button.overlay}>
-					</motion.div>
-				}
-			</AnimatePresence>
-		</button>)}
+		{
+			props.loading
+			? [...Array(8)].map((_, i) => <motion.button
+				layoutId={`${i}`}
+				key={i}
+				className={tw(styles.button.container, styles.button.skeleton)}>
+				<span className={styles.button.label}>&bull; &bull; &bull;</span>
+			</motion.button>)
+			: sections.map((section, i) => <motion.button
+				key={i}
+				layoutId={`${i}`}
+				id={`sectionscroller-${props.keyId}-${section.id}`}
+				onClick={select}
+				className={styles.button.container}>
+				<span className={styles.button.label}>{section.label}</span>
+				<AnimatePresence>
+					{
+						section.id == selectedID &&
+						<motion.div
+							initial={{ translateY: 50 }}
+							animate={{ translateY: 0, transition: { ease: "circOut", duration: 0.2 } }}
+							exit={{ translateY: 50 }}
+							className={styles.button.overlay}>
+						</motion.div>
+					}
+				</AnimatePresence>
+			</motion.button>)
+		}
 	</nav>
 }
