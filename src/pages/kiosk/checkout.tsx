@@ -1,4 +1,4 @@
-import { ReactElement, useContext } from "react"
+import { ReactElement, useContext, useEffect } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import FloatingButton from "@/components/Kiosk/FloatingButton";
@@ -52,8 +52,11 @@ const styles = {
 
 export default function Checkout() {
 	const { setHeader } = useContext(HeaderContext);
-	setHeader?.("Checkout");
-	
+
+	useEffect(() => {
+		setHeader?.("Checkout");
+	}, [setHeader]);
+
 	const router = useRouter();
 
 	const menu = useMenu(false);

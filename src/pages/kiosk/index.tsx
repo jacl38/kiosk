@@ -1,9 +1,12 @@
-import { ReactElement, useContext } from "react"
+import { ReactElement, useContext, useEffect } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 
 export default function Order() {
 	const { setHeader } = useContext(HeaderContext);
-	setHeader?.("Order here!");
+
+	useEffect(() => {
+		setHeader?.("Order here!");
+	}, [setHeader]);
 
 	return <p>order</p>
 }

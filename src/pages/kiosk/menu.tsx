@@ -1,4 +1,4 @@
-import { ReactElement, useContext, useState } from "react"
+import { ReactElement, useContext, useEffect, useState } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import SectionScroller from "@/components/Kiosk/SectionScroller";
@@ -35,7 +35,9 @@ const styles = {
 
 export default function Menu() {
 	const { setHeader } = useContext(HeaderContext);
-	setHeader?.("Menu");
+	useEffect(() => {
+		setHeader?.("Menu");
+	}, [setHeader]);
 
 	const [category, setCategory] = useState<ObjectId>();
 	const [selectedItem, setSelectedItem] = useState<Item>();
