@@ -1,5 +1,6 @@
-import { Order, OrderPart } from "@/menu/structures";
-import { lowestMissingValue } from "./mathUtil";
+import { Addon, Item, Order, OrderPart } from "@/menu/structures";
+import { lowestMissingValue, sum } from "./mathUtil";
+import { ObjectId } from "mongodb";
 
 export function addPart(order: Order, part: OrderPart): Order {
 	const lowestMissingPartID = lowestMissingValue(order.parts.map(p => p.partID ?? 0));
@@ -28,4 +29,54 @@ export function changePart(order: Order, partID: number, changedPart: Partial<Or
 
 export function setPersonalInfo(order: Order, info: { name: string, notes: string, phone: string }): Order {
 	return { ...order, ...info }
+}
+
+export function calculatePartPrice(addons: Addon[], item: Item) {
+	const addonPrices = addons.map(a => a.price);
+	const addonTotal = sum(addonPrices);
+	return item.price + addonTotal;
+}
+
+export function calculateOrderSubtotal(items: Item[], addons: Addon[]) {
+	const itemTotal = sum(items.map(i => i.price));
+	const addonTotal = sum(addons.map(a => a.price));
+	return itemTotal + addonTotal;
+}
+
+export function itemsFromOrder(order: Order, items: Item[]) {
+	const result: Item[] = [];
+	order.parts.forEach(part => {
+		for(let i = 0; i < part.quantity; i++) {
+			result.push(items.find(item => item._id === part.itemID)!);
+		}
+	});
+	console.log(result.map(i => i.price).sort());
+	return result;
+}
+
+export function addonsFromOrder(order: Order, addons: Addon[]) {
+	const result: Addon[] = [];
+	order.parts.forEach(part => {
+		part.addonIDs.forEach(id => {
+			const foundAddon = addons.find(a => a._id === id);
+			if(foundAddon) {
+				for(let i = 0; i < part.quantity; i++) {
+					result.push(foundAddon);
+				}
+			}
+		});
+	});
+	console.log(result.map(a => a.price).sort());
+	return result;
+}
+
+export function flattenAddons(selectedAddons: Map<ObjectId, number>, addons: Addon[]) {
+	const result: Addon[] = [];
+	addons.forEach(addon => {
+		for(let i = 0; i < (selectedAddons.get(addon._id!) ?? 0); i++) {
+			result.push(addon);
+		}
+	});
+
+	return result;
 }

@@ -1,7 +1,7 @@
 import { Addon, Item, Order } from "@/menu/structures";
 import { ObjectId } from "mongodb";
 import '@testing-library/jest-dom';
-import { addPart, changePart, removePart, setPersonalInfo } from "@/utility/orderUtil";
+import { addPart, addonsFromOrder, calculateOrderSubtotal, calculatePartPrice, changePart, flattenAddons, itemsFromOrder, removePart, setPersonalInfo } from "@/utility/orderUtil";
 
 const testAddons: (Partial<Addon> & { _id: ObjectId })[] = [
 	{ _id: new ObjectId(0), name: "Test Addon A", price: 0.49 },
@@ -127,5 +127,79 @@ describe("Order operations", () => {
 		}
 		const actual = changePart(testOrder, 1, { quantity: 5 });
 		expect(expected).toEqual(actual);
+	});
+
+	it("Calculates the subtotal of an item and its addons", () => {
+		const addons = [testAddons[0], testAddons[1], testAddons[1], testAddons[1], testAddons[2]];
+		const item = testItems[1];
+		const expected = 10.11;
+
+		const actual = calculatePartPrice(addons as Addon[], item as Item);
+		expect(expected).toBe(actual);
+	});
+
+	it("Flattens a map of <addon ID, count> to an array of addon IDs", () => {
+		const addons = new Map<ObjectId, number>();
+		addons.set(testAddons[0]._id, 3);
+		addons.set(testAddons[1]._id, 5);
+		addons.set(testAddons[2]._id, 2);
+
+		const expected = [
+			testAddons[0], testAddons[0], testAddons[0],
+			testAddons[1], testAddons[1], testAddons[1], testAddons[1], testAddons[1],
+			testAddons[2], testAddons[2]
+		];
+
+		const actual = flattenAddons(addons, testAddons as Addon[]);
+
+		expect(expected).toEqual(actual);
+	});
+
+	it("Returns the subtotal of an order, including all items and their addons", () => {
+		const testOrder: Order = {
+			name: "",
+			notes: "",
+			phone: "",
+			timestamp: 0,
+			parts: [
+				{
+					notes: "",
+					quantity: 2,
+					itemID: testItems[0]._id!,
+					addonIDs: [
+						testAddons[0]._id, testAddons[0]._id,
+						testAddons[1]._id,
+						testAddons[2]._id, testAddons[2]._id, testAddons[2]._id
+					]
+				},
+				{
+					notes: "",
+					quantity: 1,
+					itemID: testItems[1]._id!,
+					addonIDs: [
+						testAddons[0]._id,
+						testAddons[1]._id, testAddons[1]._id, testAddons[1]._id, testAddons[1]._id,
+						testAddons[2]._id, testAddons[2]._id
+					]
+				},
+				{
+					notes: "",
+					quantity: 4,
+					itemID: testItems[2]._id!,
+					addonIDs: [
+						testAddons[0]._id, testAddons[0]._id, testAddons[0]._id,
+						testAddons[1]._id,
+						testAddons[2]._id,
+					]
+				}
+			]
+		}
+
+		const expected = 81.89;
+		const actual = calculateOrderSubtotal(
+			itemsFromOrder(testOrder, testItems as Item[]),
+			addonsFromOrder(testOrder, testAddons as Addon[]));
+		
+		expect(expected).toBeCloseTo(actual);
 	});
 });

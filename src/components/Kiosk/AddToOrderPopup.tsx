@@ -4,9 +4,11 @@ import { motion } from "framer-motion"
 import QuantitySelector from "./QuantitySelector"
 import { formatMoney } from "@/menu/moneyUtil"
 import commonStyles from "@/styles/common"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { ObjectId } from "mongodb"
 import { sum } from "@/utility/mathUtil"
+import useLocalOrder from "@/hooks/useLocalOrder"
+import { calculatePartPrice, flattenAddons } from "@/utility/orderUtil"
 
 const styles = {
 	backdrop: tw(
@@ -108,21 +110,34 @@ type AddToOrderPopupProps = {
 
 export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 	const [selectedAddons, setSelectedAddons] = useState<Map<ObjectId, number>>(new Map(props.addons.map(a => [a._id!, 0] as const)));
+	const notesRef = useRef<HTMLTextAreaElement>(null);
+
+	const order = useLocalOrder();
 
 	function setAddon(id: ObjectId, value: number) {
 		setSelectedAddons(addons => new Map(addons.set(id, value)));
 	}
 
-	function calculatePrice() {
-		const addonPrices = props.addons.map(a => a.price * (selectedAddons.get(a._id!) ?? 0));
-		const addonTotal = sum(addonPrices);
-		return props.selectedItem.price + addonTotal;
+	function addToOrder() {
+		const notes = notesRef.current?.value ?? "";
+
+		order.addPart({
+			addonIDs: flattenAddons(selectedAddons, props.addons).map(a => a._id!),
+			itemID: props.selectedItem._id!,
+			notes,
+			quantity: 1
+		});
+
+		props.backdropClicked?.();
 	}
+
+	const subtotal = calculatePartPrice(flattenAddons(selectedAddons, props.addons), props.selectedItem);
 
 	return <div
 		onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }}
 		className={styles.backdrop}>
 		<motion.div
+			onClick={e => e.stopPropagation()}
 			initial={{ opacity: 0, translateY: 40, scale: 0.8, height: 0 }}
 			animate={{ opacity: 1, translateY: 0, scale: 1, height: "auto"}}
 			className={styles.outerContainer}>
@@ -161,12 +176,12 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 
 			<div className={styles.notes.container}>
 				<span className={styles.notes.label}>Notes</span>
-				<textarea className={styles.notes.input} />
+				<textarea ref={notesRef} className={styles.notes.input} />
 			</div>
 
 			<div className={styles.order.container}>
-				<span className={styles.order.price}>Total: {formatMoney(calculatePrice())}</span>
-				<button className={commonStyles.order.button}>Add to order</button>
+				<span className={styles.order.price}>Subtotal: {formatMoney(subtotal)}</span>
+				<button onClick={addToOrder} className={commonStyles.order.button}>Add to order</button>
 			</div>
 		</motion.div>
 	</div>

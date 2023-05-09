@@ -1,6 +1,5 @@
 import { Order, OrderPart } from "@/menu/structures";
 import useLocalStorage from "./useLocalStorage";
-import { lowestMissingValue } from "@/utility/mathUtil";
 import postRequest from "@/utility/netUtil";
 import * as orderUtil from "@/utility/orderUtil";
 
