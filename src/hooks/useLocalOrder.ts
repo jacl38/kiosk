@@ -28,11 +28,25 @@ export default function useLocalOrder() {
 		setCurrent(o => orderUtil.setPersonalInfo(o, info));
 	}
 
+	function clear() {
+		setCurrent(o => ({
+			name: "",
+			notes: "",
+			parts: [],
+			phone: "",
+			timestamp: 0
+		}));
+	}
+
 	async function finalizeOrder() {
 		const request/*: OrderRequest = { intent: "order", order: current }; */ = {  };
 
 		await postRequest("order", request, async response => {
 
+
+			if(response.status === 200) {
+				clear();
+			}
 		});
 	}
 
@@ -40,6 +54,6 @@ export default function useLocalOrder() {
 		current,
 		addPart, removePart, changePart,
 		setPersonalInfo,
-		finalizeOrder
+		clear, finalizeOrder
 	}
 }
