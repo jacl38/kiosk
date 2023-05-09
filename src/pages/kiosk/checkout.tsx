@@ -7,6 +7,8 @@ import useMenu from "@/hooks/useMenu";
 import useLocalOrder from "@/hooks/useLocalOrder";
 import CheckoutItem from "@/components/Kiosk/CheckoutItem";
 import commonStyles from "@/styles/common";
+import { OrderRequest } from "../api/order";
+import postRequest from "@/utility/netUtil";
 
 const styles = {
 	heading: {
@@ -51,14 +53,21 @@ const styles = {
 export default function Checkout() {
 	const { setHeader } = useContext(HeaderContext);
 	setHeader?.("Checkout");
-
+	
 	const router = useRouter();
 
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 
-	function placeOrder() {
-		
+	async function placeOrder() {
+		const body: OrderRequest = {
+			intent: "add",
+			order: order.current
+		}
+
+		await postRequest("order", body, async response => {
+			console.log(await response.json());
+		});
 	}
 
 	return <>
