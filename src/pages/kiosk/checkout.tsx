@@ -110,9 +110,9 @@ export default function Checkout() {
 		});
 	}
 
-	const items = itemsFromOrder(order.current, menu.menu?.item!);
-	const addons = addonsFromOrder(order.current, menu.menu?.addon!);
-	const subtotal = calculateOrderSubtotal(items, addons);
+	const items = itemsFromOrder(order.current, menu.menu?.item!)!;
+	const addons = addonsFromOrder(order.current, menu.menu?.addon!)!;
+	const subtotal = calculateOrderSubtotal(items, addons)!;
 	const taxRate = menu.settings?.taxRate ?? 1;
 	const total = subtotal * (1 + taxRate / 100);
 
@@ -126,11 +126,16 @@ export default function Checkout() {
 		</ul>
 
 		<div className={styles.totalsContainer}>
-			<div className="flex flex-col">
-				<span>Subtotal: {formatMoney(subtotal)}</span>
-				<span>Tax: {formatMoney(total - subtotal)}</span>
-			</div>
-			<span className="text-xl font-bold text-green-700">Total: {formatMoney(total)}</span>
+			{
+				(subtotal !== undefined && total !== undefined) &&
+				<>
+					<div className="flex flex-col">
+						<span>Subtotal: {formatMoney(subtotal)}</span>
+						<span>Tax: {formatMoney(total - subtotal)}</span>
+					</div>
+					<span className="text-xl font-bold text-green-700">Total: {formatMoney(total)}</span>
+				</>
+			}
 		</div>
 
 		<div className={styles.miscInfo.container}>

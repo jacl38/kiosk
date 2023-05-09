@@ -32,22 +32,25 @@ export function setPersonalInfo(order: Order, info: { name?: string, notes?: str
 }
 
 export function calculatePartPrice(addons: Addon[], item: Item, quantity: number) {
+	if(!addons || !item) return;
 	const addonPrices = addons.map(a => a.price);
 	const addonTotal = sum(addonPrices);
 	return quantity * (item.price + addonTotal);
 }
 
 export function calculateOrderSubtotal(items: Item[], addons: Addon[]) {
-	const itemTotal = sum(items.map(i => i.price));
-	const addonTotal = sum(addons.map(a => a.price));
+	if(!items || !addons) return;
+	const itemTotal = sum(items.map(i => i.price))!;
+	const addonTotal = sum(addons.map(a => a.price))!;
 	return itemTotal + addonTotal;
 }
 
 export function itemsFromOrder(order: Order, items: Item[]) {
+	if(!order || !items) return;
 	const result: Item[] = [];
 	order.parts.forEach(part => {
 		for(let i = 0; i < part.quantity; i++) {
-			result.push(items.find(item => item._id === part.itemID)!);
+			result.push(items!.find(item => item._id === part.itemID)!);
 		}
 	});
 	return result;
