@@ -50,7 +50,6 @@ export function itemsFromOrder(order: Order, items: Item[]) {
 			result.push(items.find(item => item._id === part.itemID)!);
 		}
 	});
-	console.log(result.map(i => i.price).sort());
 	return result;
 }
 
@@ -66,7 +65,6 @@ export function addonsFromOrder(order: Order, addons: Addon[]) {
 			}
 		});
 	});
-	console.log(result.map(a => a.price).sort());
 	return result;
 }
 

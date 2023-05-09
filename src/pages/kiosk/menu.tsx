@@ -13,6 +13,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import useLocalOrder from "@/hooks/useLocalOrder";
 import { addonsFromOrder, calculateOrderSubtotal, itemsFromOrder } from "@/utility/orderUtil";
 import { formatMoney } from "@/menu/moneyUtil";
+import FloatingButton from "@/components/Kiosk/FloatingButton";
+import { useRouter } from "next/router";
 
 const styles = {
 	tabBar: tw(
@@ -34,19 +36,19 @@ const styles = {
 export default function Menu() {
 	const { setHeader } = useContext(HeaderContext);
 	setHeader?.("Menu");
+
 	const [category, setCategory] = useState<ObjectId>();
+	const [selectedItem, setSelectedItem] = useState<Item>();
 
 	const menu = useMenu(false);
 	const order = useLocalOrder();
+	const router = useRouter();
 
 	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item), addonsFromOrder(order.current, menu.menu.addon)) : 0;
 
 	const filteredItems = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
-
 	const itemsWithoutImages = filteredItems?.filter(i => i.imageID === null);
 	const itemsWithImages = filteredItems?.filter(i => i.imageID !== null);
-
-	const [selectedItem, setSelectedItem] = useState<Item>();
 
 	function getImage(item: Item) {
 		const imageID = item.imageID!;
@@ -114,6 +116,21 @@ export default function Menu() {
 				/>
 			}
 		</AnimatePresence>
+
+		<FloatingButton
+			action={() => {
+				if(orderSubtotal && confirm("Are you sure you want to end this order?")) {
+					order.clear();
+					router.push("/kiosk");
+				}
+				if(!orderSubtotal) router.push("/kiosk");
+			}}>
+			<span className={tw(
+				`font-mono text-5xl`,
+				`group-hover:-translate-x-1 transition-transform`)}>
+				&lsaquo;
+			</span>
+		</FloatingButton>
 	</>
 }
 
