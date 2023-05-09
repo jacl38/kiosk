@@ -85,7 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 						const result = await objectCollection.deleteOne({ _id: new ObjectId(request.id) });
 
 						if(result.acknowledged) {
-							res.status(200).send({ message: `Remove ${result.deletedCount} from ${request.type}` });
+							res.status(200).send({ message: `Removed ${result.deletedCount} from ${request.type}` });
 						} else {
 							res.status(500).send({ error: "An error occurred. No object removed." });
 						}

@@ -41,9 +41,10 @@ export type OrderPart = {
 	notes: string
 }
 
-export const OrderCollectionName = "MenuOrder";
+export const OrderCollectionName = "AllOrders";
 export type Order = {
 	_id?: ObjectId,
+	finished?: boolean,
 	parts: OrderPart[],
 	notes: string,
 	name: string,
