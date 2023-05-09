@@ -96,16 +96,18 @@ export default function Menu() {
 				</div>
 			</motion.div>
 		</AnimatePresence>
-
-		{
-			selectedItem &&
-			<AddToOrderPopup
-				selectedItem={selectedItem}
-				addons={getAddons(selectedItem)}
-				image={getImage(selectedItem)?.data}
-				backdropClicked={() => setSelectedItem(undefined)}
-			/>
-		}
+		
+		<AnimatePresence>
+			{
+				selectedItem &&
+				<AddToOrderPopup
+					selectedItem={selectedItem}
+					addons={getAddons(selectedItem)}
+					image={getImage(selectedItem)?.data}
+					backdropClicked={() => setSelectedItem(undefined)}
+				/>
+			}
+		</AnimatePresence>
 	</>
 }
 

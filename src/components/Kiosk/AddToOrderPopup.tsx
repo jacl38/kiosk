@@ -1,19 +1,18 @@
 import { Addon, Item } from "@/menu/structures"
 import { tw } from "@/utility/tailwindUtil"
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import QuantitySelector from "./QuantitySelector"
 import { formatMoney } from "@/menu/moneyUtil"
 import commonStyles from "@/styles/common"
 import { useRef, useState } from "react"
 import { ObjectId } from "mongodb"
-import { sum } from "@/utility/mathUtil"
 import useLocalOrder from "@/hooks/useLocalOrder"
 import { calculatePartPrice, flattenAddons } from "@/utility/orderUtil"
 
 const styles = {
 	backdrop: tw(
 		`fixed inset-0 flex z-20`,
-		`backdrop-blur-[2px] bg-hotchocolate-600 bg-opacity-10`
+		`bg-hotchocolate-600 bg-opacity-10`
 	),
 	outerContainer: tw(
 		`m-auto`,
@@ -133,13 +132,17 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 
 	const subtotal = calculatePartPrice(flattenAddons(selectedAddons, props.addons), props.selectedItem);
 
-	return <div
+	return <motion.div
+		initial={{ opacity: 0, backdropFilter: "blur(0)" }}
+		animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
+		exit={{ opacity: 0, backdropFilter: "blur(0)" }}
 		onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }}
 		className={styles.backdrop}>
 		<motion.div
 			onClick={e => e.stopPropagation()}
-			initial={{ opacity: 0, translateY: 40, scale: 0.8, height: 0 }}
-			animate={{ opacity: 1, translateY: 0, scale: 1, height: "auto"}}
+			initial={{ translateY: 40, scale: 0.8, height: 0 }}
+			animate={{ translateY: 0, scale: 1, height: "auto" }}
+			exit={{ scale: 0, height: 0 }}
 			className={styles.outerContainer}>
 
 			<div className={styles.titlebar.container}>
@@ -184,5 +187,5 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 				<button onClick={addToOrder} className={commonStyles.order.button}>Add to order</button>
 			</div>
 		</motion.div>
-	</div>
+	</motion.div>
 }
