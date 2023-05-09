@@ -134,7 +134,7 @@ describe("Order operations", () => {
 		const item = testItems[1];
 		const expected = 10.11;
 
-		const actual = calculatePartPrice(addons as Addon[], item as Item);
+		const actual = calculatePartPrice(addons as Addon[], item as Item, 1);
 		expect(expected).toBe(actual);
 	});
 

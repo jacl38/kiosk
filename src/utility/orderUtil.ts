@@ -27,7 +27,7 @@ export function changePart(order: Order, partID: number, changedPart: Partial<Or
 	});
 }
 
-export function setPersonalInfo(order: Order, info: { name: string, notes: string, phone: string }): Order {
+export function setPersonalInfo(order: Order, info: { name?: string, notes?: string, phone?: string }): Order {
 	return { ...order, ...info }
 }
 

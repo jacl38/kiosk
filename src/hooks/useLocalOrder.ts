@@ -24,7 +24,7 @@ export default function useLocalOrder() {
 		setCurrent(o => orderUtil.changePart(o, partID, changedPart));
 	}
 
-	function setPersonalInfo(info: { name: string, notes: string, phone: string }) {
+	function setPersonalInfo(info: { name?: string, notes?: string, phone?: string }) {
 		setCurrent(o => orderUtil.setPersonalInfo(o, info));
 	}
 
