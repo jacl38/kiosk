@@ -174,6 +174,11 @@ const commonStyles = {
 			`border-b-4 border-emerald-800`,
 			`hover:border-b-2`,
 			`transition-all`
+		),
+		buttonDisabled: tw(
+			`opacity-50`,
+			`hover:border-b-4`,
+			`cursor-default`
 		)
 	}
 }

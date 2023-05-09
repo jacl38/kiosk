@@ -10,6 +10,9 @@ import { ObjectId } from "mongodb";
 import AddToOrderPopup from "@/components/Kiosk/AddToOrderPopup";
 import { Addon, Item } from "@/menu/structures";
 import { AnimatePresence, motion } from "framer-motion";
+import useLocalOrder from "@/hooks/useLocalOrder";
+import { addonsFromOrder, calculateOrderSubtotal, itemsFromOrder } from "@/utility/orderUtil";
+import { formatMoney } from "@/menu/moneyUtil";
 
 const styles = {
 	tabBar: tw(
@@ -34,6 +37,9 @@ export default function Menu() {
 	const [category, setCategory] = useState<ObjectId>();
 
 	const menu = useMenu(false);
+	const order = useLocalOrder();
+
+	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item), addonsFromOrder(order.current, menu.menu.addon)) : 0;
 
 	const filteredItems = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
 
@@ -70,9 +76,9 @@ export default function Menu() {
 			/>
 			<div className={styles.checkoutContainer}>
 				<Link
-					href="./checkout"
-					className={commonStyles.order.button}>
-					Checkout &rsaquo;
+					href={orderSubtotal ? `./checkout` : {}}
+					className={tw(commonStyles.order.button, orderSubtotal ? "" : commonStyles.order.buttonDisabled)}>
+					Checkout {orderSubtotal ? `(${formatMoney(orderSubtotal)})` : ""} &rsaquo;
 				</Link>
 			</div>
 		</div>
