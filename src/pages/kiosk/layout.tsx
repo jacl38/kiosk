@@ -5,7 +5,7 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "re
 const styles = {
 	outerContainer: tw(
 		`bg-hotchocolate-50`,
-		`flex-auto`,
+		`flex flex-col flex-auto`,
 	)
 }
 
