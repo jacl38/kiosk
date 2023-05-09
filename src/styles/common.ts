@@ -179,6 +179,11 @@ const commonStyles = {
 			`opacity-50`,
 			`hover:border-b-4`,
 			`cursor-default`
+		),
+		backdrop: tw(
+			`fixed inset-0 flex z-20`,
+			`bg-hotchocolate-600 bg-opacity-10`,
+			`backdrop-blur-[2px]`
 		)
 	}
 }

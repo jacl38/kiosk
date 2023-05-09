@@ -1,6 +1,6 @@
 import { Addon, Item } from "@/menu/structures"
 import { tw } from "@/utility/tailwindUtil"
-import { AnimatePresence, motion } from "framer-motion"
+import { motion } from "framer-motion"
 import QuantitySelector from "./QuantitySelector"
 import { formatMoney } from "@/menu/moneyUtil"
 import commonStyles from "@/styles/common"
@@ -10,10 +10,6 @@ import useLocalOrder from "@/hooks/useLocalOrder"
 import { calculatePartPrice, flattenAddons } from "@/utility/orderUtil"
 
 const styles = {
-	backdrop: tw(
-		`fixed inset-0 flex z-20`,
-		`bg-hotchocolate-600 bg-opacity-10`
-	),
 	outerContainer: tw(
 		`m-auto`,
 		`w-[36rem]`,
@@ -144,7 +140,7 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 		animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
 		exit={{ opacity: 0, backdropFilter: "blur(0)" }}
 		onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }}
-		className={styles.backdrop}>
+		className={commonStyles.order.backdrop}>
 		<motion.div
 			onClick={e => e.stopPropagation()}
 			initial={{ translateY: 40, scale: 0.8, height: 0 }}

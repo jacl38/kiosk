@@ -1,4 +1,4 @@
-import { ReactElement, useContext, useEffect } from "react"
+import { ReactElement, useContext, useEffect, useState } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import FloatingButton from "@/components/Kiosk/FloatingButton";
@@ -9,6 +9,8 @@ import CheckoutItem from "@/components/Kiosk/CheckoutItem";
 import commonStyles from "@/styles/common";
 import { OrderRequest } from "../api/order";
 import postRequest from "@/utility/netUtil";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 const styles = {
 	heading: {
@@ -47,6 +49,28 @@ const styles = {
 		label: tw(
 			`text-lg font-semibold`
 		)
+	},
+	sentBox: {
+		container: tw(
+			`bg-white`,
+			`shadow-xl`,
+			`rounded-2xl`,
+			`overflow-hidden`,
+			`border-b-4 border-green-700 border-opacity-25`,
+			`m-auto`,
+			`w-96 h-96`,
+			`flex flex-col justify-between`
+		),
+		confirmationContainer: tw(
+			`flex flex-col justify-center items-center`,
+			`gap-y-4`,
+			`shadow flex-auto`
+		),
+		itemContainer: tw(
+			`bg-green-700 bg-opacity-10`,
+			`flex justify-center`,
+			`py-4 shrink-0`
+		)
 	}
 }
 
@@ -62,14 +86,19 @@ export default function Checkout() {
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 
+	const [sending, setSending] = useState<"none" | "sending" | "sent">("none");
+
 	async function placeOrder() {
+		setSending("sending");
 		const body: OrderRequest = {
 			intent: "add",
-			order: order.current
+			order: {...order.current, timestamp: Date.now()}
 		}
 
 		await postRequest("order", body, async response => {
-			console.log(await response.json());
+			if(response.status === 200) {
+				setSending("sent");
+			}
 		});
 	}
 
@@ -111,8 +140,34 @@ export default function Checkout() {
 						className={tw(styles.miscInfo.inputBox, "resize-none")} />
 				</div>
 			</div>
-			<button onClick={placeOrder} className={tw(commonStyles.order.button, `text-2xl mx-auto`)}>Place Order</button>
+			<button
+				disabled={sending !== "none"}
+				onClick={placeOrder}
+				className={tw(
+					commonStyles.order.button, `text-2xl mx-auto`,
+					sending !== "none" ? tw(commonStyles.order.buttonDisabled, `animate-pulse`) : "")}>
+				Place Order
+			</button>
 		</div>
+
+		
+		{
+			sending === "sent" &&
+			<div className={commonStyles.order.backdrop}>
+				<motion.div
+					initial={{ opacity: 0, translateY: 40, scale: 0.8 }}
+					animate={{ opacity: 1, translateY: 0, scale: 1 }}
+					className={styles.sentBox.container}>
+					<div className={styles.sentBox.confirmationContainer}>
+						<span className="text-3xl font-semibold">Order placed!</span>
+						<span className="text-xl text-center">You're all set,<br />{order.current.name}.</span>
+					</div>
+					<div className={styles.sentBox.itemContainer}>
+						<Link href="/kiosk" className={tw(commonStyles.order.button, "text-xl")}>Finish</Link>
+					</div>
+				</motion.div>
+			</div>
+		}
 
 		<FloatingButton
 			action={() => router.push("/kiosk/menu")}>
