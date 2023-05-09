@@ -57,6 +57,8 @@ export default function Checkout() {
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 
+	const 
+
 	return <>
 		<div className={styles.heading.container}>
 			<h2 className={styles.heading.label}>Let's make sure we got everything...</h2>
