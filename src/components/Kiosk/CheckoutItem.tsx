@@ -148,7 +148,7 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 						{allAddons.map(addon => {
 							const quantity = selectedAddons.get(addon._id!) ?? 0;
 
-							return <ul className={styles.addonInfo.innerContainer}>
+							return <ul key={addon._id?.toString()} className={styles.addonInfo.innerContainer}>
 								<div className="flex flex-col w-56">
 									<span className={styles.itemInfo.name}>{addon.name}</span>
 									<div className="flex items-center">

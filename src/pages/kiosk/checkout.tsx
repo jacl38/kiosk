@@ -63,11 +63,11 @@ export default function Checkout() {
 
 	return <>
 		<div className={styles.heading.container}>
-			<h2 className={styles.heading.label}>Let's make sure we got everything...</h2>
+			<h2 className={styles.heading.label}>Let&apos;s make sure we got everything...</h2>
 		</div>
 
 		<ul className={styles.itemList}>
-			{menu.menu && order.current.parts.map(part => <CheckoutItem menu={menu.menu!} part={part} />)}
+			{menu.menu && order.current.parts.map(part => <CheckoutItem key={part.partID} menu={menu.menu!} part={part} />)}
 		</ul>
 
 		<div className={styles.miscInfo.container}>
