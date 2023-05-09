@@ -182,7 +182,7 @@ export default function Checkout() {
 					className={styles.sentBox.container}>
 					<div className={styles.sentBox.confirmationContainer}>
 						<span className="text-3xl font-semibold">Order placed!</span>
-						<span className="text-xl text-center">You're all set,<br />{order.current.name}.</span>
+						<span className="text-xl text-center">You&apos;re all set,<br />{order.current.name}.</span>
 					</div>
 					<div className={styles.sentBox.itemContainer}>
 						<Link href="/kiosk" className={tw(commonStyles.order.button, "text-xl")}>Finish</Link>
