@@ -5,14 +5,14 @@ import { useRef } from "react"
 
 const styles = {
 	outerContainer: tw(
-		`p-1`,
+		`p-0.5`,
 		`rounded-full`,
-		`border-2`,
+		`border-2 border-black border-opacity-10`,
 		`flex justify-between space-x-2 items-center`
 	),
 	button: tw(
-		`w-10 h-10 shrink-0`,
-		`border-2`,
+		`w-9 h-9 shrink-0`,
+		`border-2 border-black border-opacity-10`,
 		`rounded-full`,
 		`flex items-center justify-center`,
 		`text-4xl font-black text-neutral-600`,

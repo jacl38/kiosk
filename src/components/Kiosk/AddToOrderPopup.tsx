@@ -185,8 +185,8 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			}
 
 			<div className={styles.notes.container}>
-				<span className={styles.notes.label}>Notes</span>
-				<textarea ref={notesRef} className={styles.notes.input} />
+				<label htmlFor={`add-${props.selectedItem._id}`} className={styles.notes.label}>Notes</label>
+				<textarea id={`add-${props.selectedItem._id}`} ref={notesRef} className={styles.notes.input} />
 			</div>
 			
 			<div className={styles.quantity.container}>

@@ -11,7 +11,7 @@ const styles = {
 		`border-b-2 border-hotchocolate-200`,
 		`rounded-md`,
 		`overflow-hidden`,
-		`relative flex flex-col text-start`,
+		`relative flex flex-col`,
 		`h-min`,
 		`select-none cursor-pointer`
 	),
