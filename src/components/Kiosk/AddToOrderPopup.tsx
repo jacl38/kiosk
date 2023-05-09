@@ -192,7 +192,7 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			</div>
 
 			<div className={styles.order.container}>
-				<span className={styles.order.price}>Subtotal: {formatMoney(subtotal)}</span>
+				<span className={styles.order.price}>Subtotal: {formatMoney(subtotal ?? 0)}</span>
 				<button onClick={addToOrder} className={commonStyles.order.button}>Add to order</button>
 			</div>
 		</motion.div>

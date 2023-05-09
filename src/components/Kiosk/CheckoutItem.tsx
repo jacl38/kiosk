@@ -126,12 +126,12 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 						/>
 					: <span className="m-auto font-semibold text-lg">{props.part.quantity}</span>
 				}
-				<span className="shrink-0">&nbsp;&times; {formatMoney(singleItemSubtotal)}</span>
+				<span className="shrink-0">&nbsp;&times; {formatMoney(singleItemSubtotal ?? 0)}</span>
 				</motion.div>
 			</div>
 
 			<div className={styles.itemInfo.rightSide}>
-				<span className={styles.itemInfo.price}>{formatMoney(singleItemSubtotal * props.part.quantity)}</span>
+				<span className={styles.itemInfo.price}>{formatMoney((singleItemSubtotal ?? 0) * props.part.quantity)}</span>
 				<button className={styles.itemInfo.deleteButton}>✕</button>
 			</div>
 		</div>
