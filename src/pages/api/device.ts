@@ -32,6 +32,16 @@ export type PairRequest = {
 let pairingEnabled = false;
 let pairingTimer: NodeJS.Timer;
 
+export async function devicePaired(req: NextApiRequest, res: NextApiResponse) {
+	const authCollection = await getCollection("auth");
+	const adminAccount = await authCollection.findOne({}) as unknown as AuthFormat;
+	const { connectedClients } = adminAccount;
+
+	const deviceToken = getCookie("device-token", { req, res }) ?? "";
+	const authenticated = connectedClients.map(d => d.token).includes(hash(deviceToken as string));
+	return authenticated;
+}
+
 /** Time before pairing automatically closes (seconds). */
 const closePairTimeout = 30;
 

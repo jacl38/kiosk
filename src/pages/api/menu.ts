@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse, PageConfig } from "next";
 import { query } from "./auth";
-import { getAddons, getCategories, getImages, getItems, getMenu } from "@/menu/menuUtil";
+import { getImages, getMenu } from "@/menu/menuUtil";
 import { Addon, AddonCollectionName, Category, CategoryCollectionName, Item, ItemCollectionName, Settings, SettingsCollectionName } from "@/menu/structures";
-import { Binary, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import getCollection from "./db";
 import sharp from "sharp";
 
