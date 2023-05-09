@@ -11,6 +11,8 @@ import { OrderRequest } from "../api/order";
 import postRequest from "@/utility/netUtil";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { formatMoney } from "@/menu/moneyUtil";
+import { addonsFromOrder, calculateOrderSubtotal, itemsFromOrder } from "@/utility/orderUtil";
 
 const styles = {
 	heading: {
@@ -50,6 +52,12 @@ const styles = {
 			`text-lg font-semibold`
 		)
 	},
+	totalsContainer: tw(
+		`flex justify-between`,
+		`px-8 mb-4`,
+		`text-lg font-semibold`,
+		`text-hotchocolate-800`
+	),
 	sentBox: {
 		container: tw(
 			`bg-white`,
@@ -102,6 +110,12 @@ export default function Checkout() {
 		});
 	}
 
+	const items = itemsFromOrder(order.current, menu.menu?.item!);
+	const addons = addonsFromOrder(order.current, menu.menu?.addon!);
+	const subtotal = calculateOrderSubtotal(items, addons);
+	const taxRate = menu.settings?.taxRate ?? 1;
+	const total = subtotal * (1 + taxRate / 100);
+
 	return <>
 		<div className={styles.heading.container}>
 			<h2 className={styles.heading.label}>Let&apos;s make sure we got everything...</h2>
@@ -110,6 +124,14 @@ export default function Checkout() {
 		<ul className={styles.itemList}>
 			{menu.menu && order.current.parts.map(part => <CheckoutItem key={part.partID} menu={menu.menu!} part={part} />)}
 		</ul>
+
+		<div className={styles.totalsContainer}>
+			<div className="flex flex-col">
+				<span>Subtotal: {formatMoney(subtotal)}</span>
+				<span>Tax: {formatMoney(total - subtotal)}</span>
+			</div>
+			<span className="text-xl font-bold text-green-700">Total: {formatMoney(total)}</span>
+		</div>
 
 		<div className={styles.miscInfo.container}>
 			<div className={styles.miscInfo.inputGrid}>

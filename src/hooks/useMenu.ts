@@ -22,17 +22,15 @@ export default function useMenu(admin: boolean) {
 				setMenuLoaded(true);
 			}
 		});
-		
-		if(admin) {
-			await postRequest("menu", { intent: "getsettings" }, async response => {
-				if(response.status === 200) {
-					const body = await response.json();
-					setSettings(body.settings);
-					setSettingsLoaded(true);
-				}
-			});
-		}
-	}, [admin]);
+
+		await postRequest("menu", { intent: "getsettings" }, async response => {
+			if(response.status === 200) {
+				const body = await response.json();
+				setSettings(body.settings);
+				setSettingsLoaded(true);
+			}
+		});
+	}, []);
 
 	useEffect(() => {
 		reFetch();
