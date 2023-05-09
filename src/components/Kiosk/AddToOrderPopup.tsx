@@ -88,6 +88,12 @@ const styles = {
 			`py-1 px-1.5`
 		)
 	},
+	quantity: {
+		container: tw(
+			`flex justify-center`,
+			`pb-4 pt-2`
+		)
+	},
 	order: {
 		container: tw(
 			`bg-green-700 bg-opacity-10`,
@@ -109,6 +115,7 @@ type AddToOrderPopupProps = {
 
 export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 	const [selectedAddons, setSelectedAddons] = useState<Map<ObjectId, number>>(new Map(props.addons.map(a => [a._id!, 0] as const)));
+	const [quantity, setQuantity] = useState(1);
 	const notesRef = useRef<HTMLTextAreaElement>(null);
 
 	const order = useLocalOrder();
@@ -124,13 +131,13 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			addonIDs: flattenAddons(selectedAddons, props.addons).map(a => a._id!),
 			itemID: props.selectedItem._id!,
 			notes,
-			quantity: 1
+			quantity
 		});
 
 		props.backdropClicked?.();
 	}
 
-	const subtotal = calculatePartPrice(flattenAddons(selectedAddons, props.addons), props.selectedItem);
+	const subtotal = calculatePartPrice(flattenAddons(selectedAddons, props.addons), props.selectedItem, quantity);
 
 	return <motion.div
 		initial={{ opacity: 0, backdropFilter: "blur(0)" }}
@@ -180,6 +187,12 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			<div className={styles.notes.container}>
 				<span className={styles.notes.label}>Notes</span>
 				<textarea ref={notesRef} className={styles.notes.input} />
+			</div>
+			
+			<div className={styles.quantity.container}>
+				<QuantitySelector
+					defaultValue={1} min={1}
+					onChange={v => setQuantity(v)} />
 			</div>
 
 			<div className={styles.order.container}>

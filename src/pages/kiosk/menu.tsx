@@ -1,4 +1,4 @@
-import { ReactElement, useContext, useEffect, useState } from "react"
+import { ReactElement, useContext, useState } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import SectionScroller from "@/components/Kiosk/SectionScroller";

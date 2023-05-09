@@ -31,10 +31,10 @@ export function setPersonalInfo(order: Order, info: { name: string, notes: strin
 	return { ...order, ...info }
 }
 
-export function calculatePartPrice(addons: Addon[], item: Item) {
+export function calculatePartPrice(addons: Addon[], item: Item, quantity: number) {
 	const addonPrices = addons.map(a => a.price);
 	const addonTotal = sum(addonPrices);
-	return item.price + addonTotal;
+	return quantity * (item.price + addonTotal);
 }
 
 export function calculateOrderSubtotal(items: Item[], addons: Addon[]) {
