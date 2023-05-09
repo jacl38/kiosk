@@ -57,7 +57,9 @@ export default function Checkout() {
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 
-	const 
+	function placeOrder() {
+		
+	}
 
 	return <>
 		<div className={styles.heading.container}>
@@ -72,18 +74,32 @@ export default function Checkout() {
 			<div className={styles.miscInfo.inputGrid}>
 				<div>
 					<label htmlFor="order-name" className={styles.miscInfo.label}>* Name:</label>
-					<input id="order-name" type="text" className={styles.miscInfo.inputBox} />
+					<input
+						defaultValue={order.current.name}
+						onBlur={e => order.setPersonalInfo({ name: e.target.value })}
+						id="order-name"
+						type="text"
+						className={styles.miscInfo.inputBox} />
 				</div>
 				<div>
 					<label htmlFor="order-phone" className={styles.miscInfo.label}>Phone number:</label>
-					<input id="order-phone" type="tel" className={styles.miscInfo.inputBox} />
+					<input
+						defaultValue={order.current.phone}
+						onBlur={e => order.setPersonalInfo({ phone: e.target.value })}
+						id="order-phone"
+						type="tel"
+						className={styles.miscInfo.inputBox} />
 				</div>
 				<div className="col-span-2">
 					<label htmlFor="order-notes" className={styles.miscInfo.label}>Notes:</label>
-					<textarea id="order-notes" className={tw(styles.miscInfo.inputBox, "resize-none")} />
+					<textarea
+						defaultValue={order.current.notes}
+						onBlur={e => order.setPersonalInfo({ notes: e.target.value })}
+						id="order-notes"
+						className={tw(styles.miscInfo.inputBox, "resize-none")} />
 				</div>
 			</div>
-			<button className={tw(commonStyles.order.button, `text-2xl mx-auto`)}>Place Order</button>
+			<button onClick={placeOrder} className={tw(commonStyles.order.button, `text-2xl mx-auto`)}>Place Order</button>
 		</div>
 
 		<FloatingButton
