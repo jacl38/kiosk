@@ -25,3 +25,7 @@ export function clamp(input: number, min?: number, max?: number) {
 export function sum(input: number[]) {
 	return input.reduce((a, b) => a + b, 0);
 }
+
+export function remap(value: number, input: { min: number, max: number }, output: { min: number, max: number }) {
+	return output.min + (value - input.min) * (output.max - output.min) / (input.max - input.min);
+}
