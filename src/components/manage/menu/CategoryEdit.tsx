@@ -38,7 +38,7 @@ export default function CategoryEdit(props: Category & { onChange: (category: Ca
 				id="name-input"
 				ref={nameInput}
 				type="text"
-				placeholder={props.name}
+				defaultValue={props.name}
 				className={commonStyles.management.inputBox} />
 		</div>
 
@@ -51,7 +51,7 @@ export default function CategoryEdit(props: Category & { onChange: (category: Ca
 				}}
 				id="description-input"
 				ref={descriptionInput}
-				placeholder={props.description}
+				defaultValue={props.description}
 				className={tw(commonStyles.management.inputBox, "resize-none")} />
 		</div>
 	</div>

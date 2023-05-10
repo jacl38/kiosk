@@ -38,7 +38,7 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 				id="name-input"
 				ref={nameInput}
 				type="text"
-				placeholder={props.name}
+				defaultValue={props.name}
 				className={commonStyles.management.inputBox} />
 		</div>
 
@@ -53,7 +53,7 @@ export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => v
 				id="price-input"
 				ref={priceInput}
 				type="number"
-				placeholder={formatMoney(props.price)}
+				defaultValue={props.price}
 				className={commonStyles.management.inputBox} />
 		</div>
 	</div>

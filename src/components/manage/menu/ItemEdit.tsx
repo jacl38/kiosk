@@ -68,7 +68,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 						id="name-input"
 						ref={nameInput}
 						type="text"
-						placeholder={props.name}
+						defaultValue={props.name}
 						className={commonStyles.management.inputBox} />
 				</div>
 
@@ -83,7 +83,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 						id="price-input"
 						ref={priceInput}
 						type="number"
-						placeholder={formatMoney(props.price)}
+						defaultValue={props.price}
 						className={commonStyles.management.inputBox} />
 				</div>
 
@@ -96,7 +96,7 @@ export default function ItemEdit(props: Item & { onChange: (item: Item & { image
 						}}
 						id="description-input"
 						ref={descriptionInput}
-						placeholder={props.description}
+						defaultValue={props.description}
 						className={tw(commonStyles.management.inputBox, "resize-none")} />
 				</div>
 
