@@ -1,4 +1,4 @@
-import { ReactElement, useContext, useEffect, useState } from "react"
+import { ReactElement, useCallback, useContext, useEffect, useState } from "react"
 import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import SectionScroller from "@/components/Kiosk/SectionScroller";
@@ -48,19 +48,25 @@ export default function Menu() {
 		setHeader?.("Menu");
 	}, [setHeader]);
 
+	const menu = useMenu(false);
+	const order = useLocalOrder();
+	const router = useRouter();
+
 	const [category, setCategory] = useState<ObjectId>();
 	const [selectedItem, setSelectedItem] = useState<Item>();
 
 	const [searchQuery, setSearchQuery] = useState<string>();
+
+	const getItemsByCategory = useCallback(() => {
+		const result = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
+		return result ?? [];
+	}, [menu, category]);
+
 	const [filteredItems, setFilteredItems] = useState<Item[]>(getItemsByCategory);
 
 	useEffect(() => {
 		setFilteredItems(getItemsByCategory());
-	}, [category]);
-
-	const menu = useMenu(false);
-	const order = useLocalOrder();
-	const router = useRouter();
+	}, [category, getItemsByCategory]);
 
 	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item)!, addonsFromOrder(order.current, menu.menu.addon)!) : 0;
 
@@ -84,11 +90,6 @@ export default function Menu() {
 		});
 
 		return addons;
-	}
-
-	function getItemsByCategory() {
-		const result = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
-		return result ?? [];
 	}
 
 	function search(query: string) {

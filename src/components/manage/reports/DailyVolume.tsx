@@ -178,7 +178,7 @@ export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 				
 				const proportion = volume.total === 0 ? 0 : volume.volume[h] / volume.total
 
-				return <div className={styles.chart.hour.container}>
+				return <div key={h} className={styles.chart.hour.container}>
 					<span className={styles.chart.hour.label}>
 						<span>{start}</span>
 						&ndash;

@@ -158,7 +158,7 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 
 					const opacity = remap(Math.sqrt(proportion), { min: 0, max: 1 }, { min: 0.15, max: 0.85 });
 
-					return <div className={styles.heatmap.day.container}>
+					return <div key={dow} className={styles.heatmap.day.container}>
 						<span className={styles.heatmap.day.label}>{day.getDate()} {day.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
 						<div className={styles.heatmap.day.box} style={{
 							backgroundColor: `rgba(0, 0, 0, ${opacity})`,
