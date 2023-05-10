@@ -30,7 +30,15 @@ const styles = {
 		`grid grid-cols-2 lg:grid-cols-3`,
 		`gap-x-1 gap-y-4`,
 		`p-4`
-	)
+	),
+	description: {
+		container: tw(
+			`px-4 py-2`
+		),
+		text: tw(
+			`text-xl italic text-hotchocolate-800`
+		)
+	}
 }
 
 export default function Menu() {
@@ -51,6 +59,8 @@ export default function Menu() {
 	const filteredItems = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
 	const itemsWithoutImages = filteredItems?.filter(i => i.imageID === null);
 	const itemsWithImages = filteredItems?.filter(i => i.imageID !== null);
+
+	const categoryInfo = menu.menu?.category.find(c => c._id === category);
 
 	function getImage(item: Item) {
 		const imageID = item.imageID!;
@@ -86,6 +96,17 @@ export default function Menu() {
 				</Link>
 			</div>
 		</div>
+
+		<AnimatePresence mode="popLayout">
+			<motion.div
+				key={category?.toString()}
+				initial={{ opacity: 0, translateX: -20, scale: 0.9 }}
+				animate={{ opacity: 1, translateX: 0, scale: 1 }}
+				exit={{ opacity: 0, translateX: 20, scale: 0.9 }}
+				className={styles.description.container}>
+				<p className={styles.description.text}>{categoryInfo?.description}</p>
+			</motion.div>
+		</AnimatePresence>
 
 		<AnimatePresence mode="popLayout">
 			<motion.div
