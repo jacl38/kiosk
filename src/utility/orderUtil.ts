@@ -1,6 +1,7 @@
 import { Addon, Item, Order, OrderPart } from "@/menu/structures";
 import { lowestMissingValue, sum } from "./mathUtil";
 import { ObjectId } from "mongodb";
+import { Menu } from "@/menu/menuUtil";
 
 export function addPart(order: Order, part: OrderPart): Order {
 	const lowestMissingPartID = lowestMissingValue(order.parts.map(p => p.partID ?? 0));
@@ -81,5 +82,61 @@ export function flattenAddons(selectedAddons: Map<ObjectId, number>, addons: Add
 		}
 	});
 
+	return result;
+}
+
+export function formatOrder(order: Order, menu: Menu) {
+	if(!order || !menu) return;
+	type FormattedPart = {
+		item: Item,
+		addons: { type: Addon, count: number }[],
+		quantity: number,
+		notes: string
+	}
+	type FormattedOrder = {
+		parts: FormattedPart[],
+		name: string,
+		notes: string,
+		phone: string,
+		price: number,
+		timestamp: number
+	}
+
+	const result: FormattedOrder = {
+		name: order.name,
+		notes: order.notes,
+		phone: order.phone,
+		timestamp: order.timestamp,
+		price: 0,
+		parts: []
+	}
+
+	const allAddons: Addon[] = [];
+
+	order.parts.forEach(part => {
+		const foundItem = menu.item.find(i => i._id === part.itemID);
+		if(!foundItem) return;
+
+		const addonsMap = new Map<Addon, number>();
+		part.addonIDs.forEach(id => {
+			const foundAddon = menu.addon.find(a => a._id === id);
+			if(!foundAddon) return;
+			addonsMap.set(foundAddon, (addonsMap.get(foundAddon) ?? 0) + 1);
+			allAddons.push(foundAddon);
+			result.price += foundAddon.price * part.quantity;
+		});
+
+		const addons = Array.from(addonsMap).map(a => ({ type: a[0], count: a[1]}));
+
+		result.parts.push({
+			item: foundItem,
+			quantity: part.quantity,
+			addons,
+			notes: part.notes
+		});
+
+		result.price += foundItem.price * part.quantity;
+	});
+	
 	return result;
 }

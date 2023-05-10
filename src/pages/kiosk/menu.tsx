@@ -54,7 +54,7 @@ export default function Menu() {
 	const order = useLocalOrder();
 	const router = useRouter();
 
-	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item)!, addonsFromOrder(order.current, menu.menu.addon)) : 0;
+	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item)!, addonsFromOrder(order.current, menu.menu.addon)!) : 0;
 
 	const filteredItems = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
 	const itemsWithoutImages = filteredItems?.filter(i => i.imageID === null);
