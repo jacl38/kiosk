@@ -57,6 +57,7 @@ export function itemsFromOrder(order: Order, items: Item[]) {
 }
 
 export function addonsFromOrder(order: Order, addons: Addon[]) {
+	if(!order || !addons) return;
 	const result: Addon[] = [];
 	order.parts.forEach(part => {
 		part.addonIDs.forEach(id => {
@@ -72,6 +73,7 @@ export function addonsFromOrder(order: Order, addons: Addon[]) {
 }
 
 export function flattenAddons(selectedAddons: Map<ObjectId, number>, addons: Addon[]) {
+	if(!selectedAddons || !addons) return [];
 	const result: Addon[] = [];
 	addons.forEach(addon => {
 		for(let i = 0; i < (selectedAddons.get(addon._id!) ?? 0); i++) {

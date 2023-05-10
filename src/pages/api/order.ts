@@ -5,9 +5,11 @@ import getCollection from "./db";
 import { devicePaired } from "./device";
 import { ObjectId } from "mongodb";
 
-export type OrderIntent = "get" | "add" | "remove" | "closeout";
+export type OrderIntent = "get" | "getall" | "add" | "remove" | "closeout";
 export type OrderRequest = {
 	intent: "get"
+} | {
+	intent: "getall"
 } | {
 	intent: "add",
 	order: Order
@@ -30,6 +32,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 			switch(request.intent) {
 				case "get": {
+					if(paired === "orders" || paired === "manage") {
+						const o = await allOrders.find({ finished: false }).toArray() as Order[];
+						res.status(200).send({ orders: o });
+					} else {
+						res.status(401).send({ error: "Unauthorized" });
+					}
+					return;
+				}
+				case "getall": {
 					if(authorized) {
 						const o = await allOrders.find({}).toArray() as Order[];
 						res.status(200).send({ orders: o });
@@ -39,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "add": {
-					if(paired) {
+					if(paired === "kiosk" || paired === "manage") {
 						await allOrders.insertOne(request.order);
 						res.status(200).send({ message: `Added ${request.order._id} to orders` });
 					} else {
@@ -48,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "remove": {
-					if(paired) {
+					if(paired === "manage") {
 						const result = await allOrders.deleteOne({ _id: new ObjectId(request.id) });
 						if(result.acknowledged) {
 							res.status(200).send({ message: `Removed ${result.deletedCount} order(s)` });
@@ -61,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					return;
 				}
 				case "closeout": {
-					if(paired) {
+					if(paired === "orders" || paired === "manage") {
 						const result = await allOrders.updateOne(
 							{ _id: new ObjectId(request.id) },
 							{ $set: { finished: true } },

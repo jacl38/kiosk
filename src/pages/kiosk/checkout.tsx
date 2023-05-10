@@ -100,7 +100,7 @@ export default function Checkout() {
 		setSending("sending");
 		const body: OrderRequest = {
 			intent: "add",
-			order: {...order.current, timestamp: Date.now()}
+			order: {...order.current, finished: false, timestamp: Date.now()}
 		}
 
 		await postRequest("order", body, async response => {

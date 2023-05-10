@@ -1,12 +1,9 @@
 import { DeviceType, PairRequest } from "@/pages/api/device";
 import postRequest from "@/utility/netUtil";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 
-export default function usePair(type: DeviceType) {
-	const router = useRouter();
-	
+export default function usePair(type: DeviceType) {	
 	const [paired, setPaired] = useState<"unknown" | "unpaired" | "paired">("unknown");
 	const [id, setID] = useState<number>();
 	const [name, setName] = useState<string>();

@@ -39,8 +39,9 @@ export async function devicePaired(req: NextApiRequest, res: NextApiResponse) {
 	const { authenticated } = (await query(req, res)).body;
 
 	const deviceToken = getCookie("device-token", { req, res }) ?? "";
-	const connected = connectedClients.map(d => d.token).includes(hash(deviceToken as string));
-	return connected || authenticated;
+	const connection = connectedClients.find(d => d.token === hash(deviceToken as string));
+
+	return authenticated ? "manage" : connection?.type;
 }
 
 /** Time before pairing automatically closes (seconds). */
