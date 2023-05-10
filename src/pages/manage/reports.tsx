@@ -27,7 +27,7 @@ export default function Reports() {
 	const orders = useOrders("all");
 	const menu = useMenu(true);
 
-	return <div className="max-w-[48rem] mx-auto space-y-4">
+	return <div className="max-w-[56rem] mx-auto space-y-4">
 		<div className="flex flex-col">
 			<select onChange={e => setReportIndex(e.target.selectedIndex - 1)} className={commonStyles.management.inputBox}>
 				<option className="hidden" disabled selected value=""></option>

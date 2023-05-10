@@ -4,6 +4,7 @@ import { Order } from "@/menu/structures";
 import commonStyles from "@/styles/common";
 import { remap, sum } from "@/utility/mathUtil";
 import { formatOrder } from "@/utility/orderUtil";
+import { serveCSV, makeCSV } from "@/utility/reportUtil";
 import { tw } from "@/utility/tailwindUtil";
 import { useState } from "react";
 
@@ -90,6 +91,34 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 		return { volume, total }
 	}
 
+	function formatAsCsv() {
+		const days = getWeekFromDate(date);
+		const count = getWeeklyCountVolume(date);
+		const revenue = getWeeklyRevenueVolume(date);
+
+		const transformedInfo = days.map((day, i) => [
+			day.toLocaleDateString(undefined, { dateStyle: "short" }),
+			count.volume[i], count.total === 0 ? 0 : count.volume[i] / count.total,
+			revenue.volume[i], revenue.total === 0 ? 0 : revenue.volume[i] / revenue.total
+		]);
+
+		return [["Date", "Items sold (count)", "Items sold (proportion)", "Revenue (total)", "Revenue (proportion)"], ...transformedInfo];
+	}
+
+	function getFilename() {
+		const startDate = getWeekFromDate(date)[0];		
+		const endDate = getWeekFromDate(date)[6];
+
+		function fileFriendlyDateString(date: Date) {
+			return date.toLocaleDateString().replaceAll("/", "_");
+		}
+
+		const dateStamp = fileFriendlyDateString(new Date());
+		const timeStamp = new Date().toLocaleTimeString().replaceAll(":", "-");
+
+		return `Weekly volume report for ${fileFriendlyDateString(startDate)}-${fileFriendlyDateString(endDate)} generated on ${dateStamp} at ${timeStamp}`;
+	}
+
 	return <div>
 		<input onChange={e => {
 			const selectedDate = e.target.valueAsDate;
@@ -110,7 +139,7 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 		</div>
 
 		<p className={tw(commonStyles.management.subtitle, "text-center")}>
-			Week of {date?.toLocaleDateString(undefined, { dateStyle: "medium" })}
+			Week of {getWeekFromDate(date)[0].toLocaleDateString(undefined, { dateStyle: "medium" })}
 		</p>
 
 		<div className={styles.heatmap.container}>
@@ -140,6 +169,9 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 					</div>
 				})
 			}
+		</div>
+		<div className="flex justify-center">
+			<a href={serveCSV(makeCSV(formatAsCsv()))} download={getFilename()} className={commonStyles.management.download}>Download report</a>
 		</div>
 	</div>
 }
