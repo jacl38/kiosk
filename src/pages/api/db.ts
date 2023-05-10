@@ -21,6 +21,15 @@ async function connect() {
 	await connect();
 })();
 
+export async function missingConnection() {
+	try {
+		await clientPromise;
+	} catch(e) {
+		return true;
+	}
+	return false;
+}
+
 export default async function getCollection(collection: string) {
 	if(clientPromise === undefined) {
 		await connect();

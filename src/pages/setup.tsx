@@ -6,6 +6,7 @@ import commonStyles from "@/styles/common";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import postRequest from "@/utility/netUtil";
+import { missingConnection } from "./api/db";
 
 const styles = {
 	innerContainer: tw(
@@ -19,7 +20,7 @@ const styles = {
 	)
 }
 
-export default function Setup(props: { hasAdminAccount: boolean }) {
+export default function Setup(props: { hasAdminAccount: boolean, noDbConnection: boolean }) {
 	// Stateful variables to temporarily store entered credentials
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
@@ -44,15 +45,29 @@ export default function Setup(props: { hasAdminAccount: boolean }) {
 		});
 	}
 
+	const accountState = props.noDbConnection
+		? "noConn"
+		: props.hasAdminAccount
+			? "hasAdmin"
+			: "ready";
+
 	return <div className={commonStyles.management.outerContainer}>
 		{
-			props.hasAdminAccount
 			// If the admin account already exists, show a message
-			? <p className="m-auto">Administration account is already setup. If you believe this is in error, or need help resetting it, contact support.</p>
+			accountState === "hasAdmin" &&
+			<p className="m-auto">Administration account is already setup. If you believe this is in error, or need help resetting it, contact support.</p>
+		}
 
+		{
+			// If we can't connect to the database, show a message
+			accountState === "noConn" &&
+			<p className="m-auto">There is no connection to the database. Please contact support.</p>
+		}
+
+		{
 			// Otherwise, show admin account setup form
-			: <form onSubmit={e => { e.preventDefault(); submit(); }} className={styles.innerContainer}>
-
+			accountState === "ready" &&
+			<form onSubmit={e => { e.preventDefault(); submit(); }} className={styles.innerContainer}>
 				<h1 className={commonStyles.management.title}>Administration account setup</h1>
 
 				<input
@@ -79,7 +94,7 @@ export default function Setup(props: { hasAdminAccount: boolean }) {
 					className={commonStyles.management.button}>
 					Submit
 				</button>
-				
+
 				{/* Displays a list of username and password requirements. */}
 				{/* Text is red when requirement is not met. */}
 				<div>
@@ -116,7 +131,8 @@ export default function Setup(props: { hasAdminAccount: boolean }) {
 				</div>
 			</form>
 		}
-		<Link href="/" className={commonStyles.management.backButton}>&lsaquo;</Link>
+
+		<Link href="/" className={tw(commonStyles.management.backButton, `fixed top-4 left-4`)}>&lsaquo;</Link>
 		<DarkButton />
 	</div>
 }
@@ -124,9 +140,10 @@ export default function Setup(props: { hasAdminAccount: boolean }) {
 // Checks if the administration account exists while serving the page.
 // Used to conditionally show message in UI
 export async function getServerSideProps() {
-	const hasAdminAccount = await adminAccountExists();
+	const noDbConnection = await missingConnection();
+	const hasAdminAccount = noDbConnection ? false : (await adminAccountExists());
 
-	return { props: { hasAdminAccount } }
+	return { props: { hasAdminAccount, noDbConnection } }
 }
 
 type Requirement = { message: string, validator: (item: string) => boolean }
