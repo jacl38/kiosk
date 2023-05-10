@@ -15,6 +15,7 @@ import { addonsFromOrder, calculateOrderSubtotal, itemsFromOrder } from "@/utili
 import { formatMoney } from "@/menu/moneyUtil";
 import FloatingButton from "@/components/Kiosk/FloatingButton";
 import { useRouter } from "next/router";
+import Searchbox from "@/components/Kiosk/Searchbox";
 
 const styles = {
 	tabBar: tw(
@@ -50,16 +51,21 @@ export default function Menu() {
 	const [category, setCategory] = useState<ObjectId>();
 	const [selectedItem, setSelectedItem] = useState<Item>();
 
+	const [searchQuery, setSearchQuery] = useState<string>();
+	const [filteredItems, setFilteredItems] = useState<Item[]>(getItemsByCategory);
+
+	useEffect(() => {
+		setFilteredItems(getItemsByCategory());
+	}, [category]);
+
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 	const router = useRouter();
 
 	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item)!, addonsFromOrder(order.current, menu.menu.addon)!) : 0;
 
-	const filteredItems = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
 	const itemsWithoutImages = filteredItems?.filter(i => i.imageID === null);
 	const itemsWithImages = filteredItems?.filter(i => i.imageID !== null);
-
 	const categoryInfo = menu.menu?.category.find(c => c._id === category);
 
 	function getImage(item: Item) {
@@ -80,14 +86,36 @@ export default function Menu() {
 		return addons;
 	}
 
+	function getItemsByCategory() {
+		const result = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
+		return result ?? [];
+	}
+
+	function search(query: string) {
+		setSearchQuery(query);
+		query = query.toLowerCase().replaceAll(" ", "")
+		
+		if(query === "") {
+			setFilteredItems([]);
+			return;
+		}
+
+		const allItems = menu.menu?.item!;
+		const match = allItems.filter(i => {
+			return i.name.toLowerCase().replaceAll(" ", "").includes(query)
+				|| i.description.toLowerCase().replace(" ", "").includes(query);
+		});
+		console.log(match);
+		setFilteredItems(match);
+	}
+
 	return <>
 		<div className={styles.tabBar}>
 			<SectionScroller
 				loading={!menu.menuLoaded}
 				keyId="categories"
-				sections={menu.menu?.category.map(c => ({ id: c._id, label: c.name })) ?? []}
-				onSelect={id => setCategory(id)}
-			/>
+				sections={[...menu.menu?.category.map(c => ({ id: c._id, label: c.name })) ?? [], { id: "SEARCH", label: "Search 🔍\uFE0E" }]}
+				onSelect={id => setCategory(id)} />
 			<div className={styles.checkoutContainer}>
 				<Link
 					href={orderSubtotal ? `./checkout` : {}}
@@ -114,6 +142,20 @@ export default function Menu() {
 				animate={{ opacity: 1, translateY: 0, transition: { delay: 0.2 } }}
 				exit={{ opacity: 0, translateY: 20 }}
 				key={category?.toString()}>
+
+				{
+					category?.toString() === "SEARCH" &&
+					<>
+						<Searchbox onSearch={search} />
+						{
+							filteredItems.length === 0 && searchQuery?.trim() !== "" &&
+							<p className="text-center text-2xl my-4 text-hotchocolate-700">
+								Sorry, no items match the term &quot;{searchQuery}&quot;
+							</p>
+						}
+					</>
+				}
+
 				<div className={styles.itemGrid}>
 					{itemsWithoutImages?.map(i => {
 						return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i}/>

@@ -61,6 +61,9 @@ export default function ItemCard(props: Item & { image?: string, onClick?: () =>
 	const hasImage = props.image !== undefined;
 
 	return <motion.div
+		initial={{ opacity: 0, translateY: 20 }}
+		animate={{ opacity: 1, translateY: 0 }}
+		key={props._id?.toString()}
 		onClick={() => setOpened(o => !o)}
 		className={styles.outerContainer}>
 		<motion.div layoutRoot className={styles.innerContainer(hasImage)}>
