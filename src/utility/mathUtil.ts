@@ -29,3 +29,7 @@ export function sum(input: number[]) {
 export function remap(value: number, input: { min: number, max: number }, output: { min: number, max: number }) {
 	return output.min + (value - input.min) * (output.max - output.min) / (input.max - input.min);
 }
+
+export function mod(a: number, b: number) {
+	return ((a % b) + b) % b;
+}
