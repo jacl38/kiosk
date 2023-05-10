@@ -31,6 +31,10 @@ const commonStyles = {
 			`disabled:opacity-50 disabled:cursor-not-allowed`,
 			`transition-all`,
 		),
+		download: tw(
+			`underline font-semibold`,
+			`before:content-['⤓_']`
+		),
 		separator: tw(
 			`my-2 h-0.5`,
 			`border-none`,
@@ -95,7 +99,7 @@ const commonStyles = {
 				container: tw(
 					`h-full`,
 					`overflow-y-hidden`,
-					`max-lg:max-h-[80%] max-lg:max-w-[calc(100vw-4rem)] max-lg:w-96`,
+					`max-lg:max-h-[80%] max-lg:max-w-[calc(100vw-4rem)]`,
 					`max-lg:m-auto`,
 					`p-4`,
 					`bg-stone-200 dark:bg-gray-600`,
