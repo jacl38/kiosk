@@ -8,6 +8,7 @@ import { calculatePartPrice, flattenAddons } from "@/utility/orderUtil"
 import useLocalOrder from "@/hooks/useLocalOrder"
 import { formatMoney } from "@/menu/moneyUtil"
 import { ObjectId } from "mongodb"
+import { useRouter } from "next/router"
 
 const styles = {
 	outerContainer: tw(
@@ -98,9 +99,20 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 	
 	const addons = flattenAddons(selectedAddons, allAddons);
 	const order = useLocalOrder();
+	const router = useRouter();
 
 	function changeAddonQuantity(id: ObjectId, value: number) {
 		setSelectedAddons(a => new Map(a.set(id, value)));
+	}
+
+	function deleteItem() {
+		if(confirm(`Are you sure you want to remove the ${item.name}${addons.length > 0 ? ` with ${addons.length} addons` : ""}?`)) {
+			order.removePart(props.part.partID!);
+			if(order.current.parts.length === 1) {
+				order.clear();
+				router.push("/kiosk/menu");
+			}
+		}
 	}
 
 	const singleItemSubtotal = calculatePartPrice(addons, item, 1);
@@ -132,7 +144,7 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 
 			<div className={styles.itemInfo.rightSide}>
 				<span className={styles.itemInfo.price}>{formatMoney((singleItemSubtotal ?? 0) * props.part.quantity)}</span>
-				<button className={styles.itemInfo.deleteButton}>✕</button>
+				<button onClick={e => { e.stopPropagation(); deleteItem(); }} className={styles.itemInfo.deleteButton}>✕</button>
 			</div>
 		</div>
 

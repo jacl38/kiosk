@@ -3,6 +3,7 @@ import Kiosk, { HeaderContext } from "./layout"
 import { tw } from "@/utility/tailwindUtil";
 import Link from "next/link";
 import commonStyles from "@/styles/common";
+import useLocalOrder from "@/hooks/useLocalOrder";
 
 const styles = {
 	outerContainer: tw(
@@ -29,6 +30,15 @@ export default function Order() {
 	useEffect(() => {
 		setHeader?.("Order here!");
 	}, [setHeader]);
+
+	const order = useLocalOrder();
+
+	useEffect(() => {
+		if(window.location.hash === "#c") {
+			window.location.hash = "";
+			order.clear();
+		}
+	}, [order]);
 
 	return <div className={styles.outerContainer}>
 		<div className={styles.innerContainer}>

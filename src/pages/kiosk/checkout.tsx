@@ -190,7 +190,7 @@ export default function Checkout() {
 						<span className="text-xl text-center">You&apos;re all set,<br />{order.current.name}.</span>
 					</div>
 					<div className={styles.sentBox.itemContainer}>
-						<Link href="/kiosk" className={tw(commonStyles.order.button, "text-xl")}>Finish</Link>
+						<Link href="/kiosk#c" className={tw(commonStyles.order.button, "text-xl")}>Finish</Link>
 					</div>
 				</motion.div>
 			</div>
