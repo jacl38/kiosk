@@ -30,18 +30,25 @@ export const HeaderContext = createContext<{
 	setHeader?: Dispatch<SetStateAction<string>>
 }>({});
 
+// Kiosk common layout component
 export default function Kiosk(props: { children: ReactNode | ReactNode[] }) {
 	const device = usePair("kiosk");
 	
-	const [header, setHeader] = useState<string>(device.paired === "paired" ? "" : "An error occurred...");
+	// `setHeader` function is passed to the HeaderContext to allow each page
+	// to set a different string as the header text.
+	// An error message displays if the device pair state is invalid 
+	const [header, setHeader] = useState<string>(device.paired === "unpaired" ? "An error occurred..." : "");
 
 	return <div className={styles.outerContainer}>
 		<HeaderContext.Provider value={{ header, setHeader }}>
 			<Header title={header}/>
-			{
-				device.paired === "paired"
-				? props.children
-				: <div className={styles.unpaired.outerContainer}>
+
+			{/* If the device is properly paired, show the rest of the page */}
+			{device.paired === "paired" && props.children}
+			
+			{// If the device is unpaired, show an error message
+				device.paired === "unpaired" &&
+				<div className={styles.unpaired.outerContainer}>
 					<div className={styles.unpaired.innerContainer}>
 						<div className="text-center">
 							<h2 className="text-3xl font-semibold">This device is not paired</h2>

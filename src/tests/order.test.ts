@@ -197,9 +197,9 @@ describe("Order operations", () => {
 
 		const expected = 81.89;
 		const actual = calculateOrderSubtotal(
-			itemsFromOrder(testOrder, testItems as Item[]),
-			addonsFromOrder(testOrder, testAddons as Addon[]));
+			itemsFromOrder(testOrder, testItems as Item[])!,
+			addonsFromOrder(testOrder, testAddons as Addon[])!);
 		
-		expect(expected).toBeCloseTo(actual);
+		expect(expected).toBeCloseTo(actual!);
 	});
 });

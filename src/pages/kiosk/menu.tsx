@@ -55,8 +55,9 @@ export default function Menu() {
 	const [category, setCategory] = useState<ObjectId>();
 	const [selectedItem, setSelectedItem] = useState<Item>();
 
-	const [searchQuery, setSearchQuery] = useState<string>();
+	const [searchQuery, setSearchQuery] = useState<string>("");
 
+	// Filters items from the full menu list by which category they belong to
 	const getItemsByCategory = useCallback(() => {
 		const result = category && menu.menu?.item.filter(i => i.categoryIDs.includes(category));
 		return result ?? [];
@@ -64,22 +65,34 @@ export default function Menu() {
 
 	const [filteredItems, setFilteredItems] = useState<Item[]>(getItemsByCategory);
 
+	// When `category` state changes, set the filtered item list appropriately
 	useEffect(() => {
 		setFilteredItems(getItemsByCategory());
-	}, [category, getItemsByCategory]);
+	}, [category]);
 
-	const orderSubtotal = menu.menu ? calculateOrderSubtotal(itemsFromOrder(order.current, menu.menu.item)!, addonsFromOrder(order.current, menu.menu.addon)!) : 0;
+	// Calculate the order subtotal, or set it to 0 if the menu has not yet loaded
+	const orderSubtotal = menu.menu
+		? calculateOrderSubtotal(
+			itemsFromOrder(order.current, menu.menu.item)!,
+			addonsFromOrder(order.current, menu.menu.addon)!)
+		: 0;
 
+	// Separate the items in `filteredItems` by the ones with and without images,
+	// which are displayed in separate grids
 	const itemsWithoutImages = filteredItems?.filter(i => i.imageID === null);
 	const itemsWithImages = filteredItems?.filter(i => i.imageID !== null);
+
+	// Get the category info paragraph from the selected category
 	const categoryInfo = menu.menu?.category.find(c => c._id === category);
 
+	// Helper function to get the image from a selected item
 	function getImage(item: Item) {
 		const imageID = item.imageID!;
 		const foundImage = menu.images?.find(img => img._id === imageID);
 		return foundImage;
 	}
 
+	// Helper function to get the list of addons from a selected item
 	function getAddons(item: Item) {
 		const addons: Addon[] = [];
 		item.addonIDs.forEach(id => {
@@ -92,6 +105,8 @@ export default function Menu() {
 		return addons;
 	}
 
+	// Function called when typing in the searchbox.
+	// Sets `filteredItems` based on the query
 	function search(query: string) {
 		setSearchQuery(query);
 		query = query.toLowerCase().replaceAll(" ", "")
@@ -102,21 +117,48 @@ export default function Menu() {
 		}
 
 		const allItems = menu.menu?.item!;
-		const match = allItems.filter(i => {
-			return i.name.toLowerCase().replaceAll(" ", "").includes(query)
-				|| i.description.toLowerCase().replace(" ", "").includes(query);
+		const matchedItems = allItems.filter(i => {
+			const transformedName = i.name.toLowerCase().replaceAll(" ", "");
+			const transformedDescription = i.description.toLowerCase().replaceAll(" ", "");
+
+			if(transformedName.includes(query)) return true;
+			if(transformedDescription.includes(query)) return true;
+
+			const addons = getAddons(i);
+			let addonMatches = false;
+			addons.forEach(addon => {
+				const addonName = addon.name.toLowerCase().replaceAll(" ", "");
+				if(addonName.includes(query)) addonMatches = true;
+			});
+			if(addonMatches) return true;
+
+			return false;
 		});
-		console.log(match);
-		setFilteredItems(match);
+		setFilteredItems(matchedItems);
 	}
 
 	return <>
 		<div className={styles.tabBar}>
+			{/* List of menu categories in a scrollable container at the top of the page */}
 			<SectionScroller
 				loading={!menu.menuLoaded}
 				keyId="categories"
-				sections={[...menu.menu?.category.map(c => ({ id: c._id, label: c.name })) ?? [], { id: "SEARCH", label: "Search 🔍\uFE0E" }]}
-				onSelect={id => setCategory(id)} />
+				sections={
+					(function() {
+						// Maps the menu categories to an array of objects of type { id: ObjectId, label: string }
+						// to display in the tab list
+						const categories: { id: string | ObjectId, label: string }[] = menu.menu?.category.map(c => ({ id: c._id!, label: c.name })) ?? [];
+
+						// Adds a search tab at the end of the list
+						if(categories.length > 0) categories.push({ id: "SEARCH", label: "Search 🔍\uFE0E" });
+						return categories;
+					})()
+				}
+				onSelect={id => setCategory(id)}
+			/>
+
+			{/* Checkout button to the right of the tab list */}
+			{/* Shows as disabled (faded green, unclickable) when `orderSubtotal` is 0 */}
 			<div className={styles.checkoutContainer}>
 				<Link
 					href={orderSubtotal ? `./checkout` : {}}
@@ -126,6 +168,8 @@ export default function Menu() {
 			</div>
 		</div>
 
+		{/* Shows the currently selected category description paragraph */}
+		{/* Uses Framer Motion to animate in and out */}
 		<AnimatePresence mode="popLayout">
 			<motion.div
 				key={category?.toString()}
@@ -137,6 +181,8 @@ export default function Menu() {
 			</motion.div>
 		</AnimatePresence>
 
+		{/* Shows the currently selected category's item list */}
+		{/* Uses Framer Motion to animate in and out */}
 		<AnimatePresence mode="popLayout">
 			<motion.div
 				initial={{ opacity: 0, translateY: -20 }}
@@ -145,6 +191,8 @@ export default function Menu() {
 				key={category?.toString()}>
 
 				{
+					// If the current tab is the search tab,
+					// show the search box
 					category?.toString() === "SEARCH" &&
 					<>
 						<Searchbox onSearch={search} />
@@ -157,6 +205,8 @@ export default function Menu() {
 					</>
 				}
 
+				{/* Show each item without images in a grid first, then show the items with images below */}
+				{/* Passes the item info into an ItemCard component */}
 				<div className={styles.itemGrid}>
 					{itemsWithoutImages?.map(i => {
 						return <ItemCard onClick={() => setSelectedItem(i)} key={`imagecard-${i._id}`} {...i}/>
@@ -171,6 +221,7 @@ export default function Menu() {
 			</motion.div>
 		</AnimatePresence>
 		
+		{/* Shows the AddToOrderPopup if an item is selected */}
 		<AnimatePresence>
 			{
 				selectedItem &&
@@ -183,6 +234,9 @@ export default function Menu() {
 			}
 		</AnimatePresence>
 
+		{/* Shows the back button at the bottom left of the page */}
+		{/* Confirms whether the user wants to end the order,
+			then goes to the /kiosk page */}
 		<FloatingButton
 			action={() => {
 				if(orderSubtotal && confirm("Are you sure you want to end this order?")) {

@@ -91,6 +91,7 @@ const sortModes = {
 	}
 }
 
+// Used as the index for the /manage/menu route
 export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	const router = useRouter();
 	
@@ -103,6 +104,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	const [selectedSortMode, setSelectedSortMode] = useState<keyof typeof sortModes>();
 	const [selectedCategories, setSelectedCategories] = useState<ObjectId[]>([]);
 
+	// Redirects from /manage/menu to /manage/menu/category, the default tab on the menu page
 	useEffect(() => {
 		const route = router.pathname.split("/").slice(1).pop() ?? "";
 		const objectType = router.query.object as keyof typeof tabs;
@@ -116,6 +118,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	
 	const menu = useMenu(true);
 
+	// The page uses the #d hash to tell when an object was just deleted,
+	// which signals to deselect the `selectedObjectId`
 	useEffect(() => {
 		function hashChange() {
 			if(window.location.hash === "" || window.location.hash === "#d") {
@@ -129,13 +133,20 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 		return () => window.removeEventListener("hashchange", hashChange);
 	}, [router.query, menu, router]);
 
+	// Finds the currently selected object type (category, item, addon)
+	// and returns the list of all objects of that type
 	function getRenderList() {
 		let allCategoryObjects = menu.menu?.[selectedTab ?? "category"];
+
+		// Determines the sort mode and sorts the objects by that function
 		const sortMode = selectedSortMode && sortModes[selectedSortMode];
 		if(sortMode) {
 			allCategoryObjects?.sort((a: MenuObject, b: MenuObject) => sortMode.fn(a, b) ? 1 : -1);
 		}
 
+		// If the Item tab is selected and there is a category filter currently applied,
+		// filter all the selected items by whether their category list includes
+		// the selected category
 		if(selectedTab === "item" && selectedCategories?.length) {
 			allCategoryObjects = (allCategoryObjects as Item[]).filter(i => {
 				return i.categoryIDs.some(id => selectedCategories.includes(id))
@@ -145,6 +156,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 		return allCategoryObjects;
 	}
 
+	// Sends a post request to the backend to add a new object of the selected type to the database.
+	// Object is empty by default and will be populated by the manager
 	async function addObject() {
 		if(selectedTab !== undefined) {
 			let newObj: Category | Item | Addon;
@@ -187,7 +200,9 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 	return <div className={commonStyles.management.splitScreen.container}>
 		<div className="flex flex-col h-full">
 			<div className="flex sm:space-x-2 max-sm:flex-col-reverse mb-1.5 sm:items-center">
+
 				<div className={styles.tab.container}>
+					{/* Shows each object type (Category, Item, Addon) as a tab which links to their respective routes */}
 					{Object.keys(tabs).map((t, i) => {
 						const route = t as keyof typeof tabs;
 						const tab = tabs[route];
@@ -205,6 +220,8 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 								<span className={commonStyles.management.subtitle}>{tab.label}</span>
 						</Link>
 					})}
+
+					{/* Shows the filter/sort button which opens the filter/sort menu on click */}
 					<button
 						onClick={() => setShowSortMenu(true)}
 						className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
@@ -216,9 +233,11 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 					</button>
 
 					{
+						// If the sort menu should be shown,
 						showSortMenu && 
 						<div onClick={() => setShowSortMenu(false)} className={styles.filterPanel.backdrop}>
 							<div onClick={e => e.stopPropagation()} className={styles.filterPanel.container}>
+
 								<div className="flex items-center justify-between">
 									<p className={commonStyles.management.title}>Filter/Sort {tab.label}</p>
 									<button className={styles.filterPanel.closeButton} onClick={() => setShowSortMenu(false)}>&#10754;</button>
@@ -227,21 +246,32 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 								<hr className={commonStyles.management.separator} />
 
 								<label htmlFor="sort-select" className={tw(commonStyles.management.subtitle, "ml-2")}>Sort by...</label>
-								<select onChange={e => setSelectedSortMode(e.target.value as keyof typeof sortModes)} id="sort-select" className={commonStyles.management.inputBox}>
+								{/* Show each sort mode (Alphabetical, Price) in a dropdown list */}
+								<select
+									onChange={e => setSelectedSortMode(e.target.value as keyof typeof sortModes)}
+									id="sort-select" className={commonStyles.management.inputBox}>
 									{
 										Object.keys(sortModes).map(mode => {
 											const sortMode = sortModes[mode as keyof typeof sortModes];
-											return <option key={mode} value={mode} selected={selectedSortMode === mode}>{sortMode.label}</option>
+											return <option
+												key={mode}
+												value={mode}
+												selected={selectedSortMode === mode}>
+												{sortMode.label}
+											</option>
 										})
 									}
 								</select>
 
 								{
+									// If the selected tab is for Items, show the category filter
 									tab.type === "Item" &&
 									<div className="h-48 mt-4">
+
 										<div className="flex justify-between px-2">
 											<p className={commonStyles.management.subtitle}>Filter by category...</p>
 										</div>
+
 										<MultiPicker
 											keyId="category-filter"
 											onChange={ids => setSelectedCategories(ids)}
@@ -255,63 +285,72 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 							</div>
 						</div>
 					}
-
 				</div>
+				
+
 				<div className="min-w-[6rem] w-0 max-sm:w-full max-sm:mb-2">
-					{
-						withLoading(!menu.settingsLoaded,
-							<TextConfirmField
-								label="Tax Rate" suffix="%"
-								onSubmit={v => {
-									if(menu.settings) {
-										menu.modifySettings({...menu.settings, taxRate: parseFloat(v)});
-									}
-								}}
-								inputProps={{
-									onBlur: e => {
-										if(menu.settings && e.target.value !== "") {
-											menu.modifySettings({...menu.settings, taxRate: parseFloat(e.target.value)});
-										}
-									},
-									placeholder: `${menu.settings?.taxRate ?? 0}`
-								}}
-							/>
-						)
-					}
+					{/* Input field to set the tax rate */}
+					{/* Pulls from the menu settings in the database */}
+					<TextConfirmField
+						label="Tax Rate" suffix="%"
+						onSubmit={v => {
+							if(menu.settings) {
+								menu.modifySettings({...menu.settings, taxRate: parseFloat(v)});
+							}
+						}}
+						inputProps={{
+							onBlur: e => {
+								if(menu.settings && e.target.value !== "") {
+									menu.modifySettings({...menu.settings, taxRate: parseFloat(e.target.value)});
+								}
+							},
+							placeholder: `${menu.settings?.taxRate ?? 0}`
+						}}
+					/>
 				</div>
 			</div>
 
 			<List>
 				{
-					getRenderList()?.length
-					? withLoading(!menu.menuLoaded,
-						getRenderList()?.map((object, i) => {
+					// If the menu has loaded,
+					withLoading(!menu.menuLoaded,
+						getRenderList()?.length
+						// If there is at least 1 object in the render list, map the render list to ListItems
+						? getRenderList()?.map((object, i) => {
+							// Show object info, such as name, description, and price, in a ListItem component
 							return <ListItem key={i}
 								onClick={() => router.push(`/manage/menu/${selectedTab}?id=${object._id?.toString()}`)}
 								selected={selectedObjectId === object._id?.toString()}>
 								<div className="flex h-full p-3">
+
 									<div className="flex flex-col justify-between grow-0 w-[calc(100%-2rem)] truncate">
 										<p className="truncate font-bold">{object.name}</p>
 										<p className="truncate">{"description" in object ? object.description : ""}</p>
 									</div>
+
 									<div className="shrink-0">
 										{"price" in object ? formatMoney(object.price) : ""}
 									</div>
+
 									<span className={commonStyles.management.menu.list.arrow}></span>
 								</div>
 							</ListItem>
-						}))
-					: <ListItem>
-						<div className="flex flex-col justify-between h-full p-3">
-							<p className="font-bold">No {tab.label} found.</p>
-							<p>Click the button below to get started.</p>
-						</div>
-					</ListItem>
+						})
+						// If there are no objects in the render list, show a message
+						: <ListItem>
+							<div className="flex flex-col justify-between h-full p-3">
+								<p className="font-bold">No {tab.label} found.</p>
+								<p>Click the button below to get started.</p>
+							</div>
+						</ListItem>
+					)
 				}
 				<button onClick={addObject} className={styles.newButton}></button>
 			</List>
 		</div>
-		<div onClick={e => { if(e.target === e.currentTarget) router.push(`/manage/menu/${selectedTab}`) }} className={commonStyles.management.splitScreen.details.backdrop(selectedObjectId !== undefined)}>
+		
+		<div onClick={e => { if(e.target === e.currentTarget) router.push(`/manage/menu/${selectedTab}`) }}
+			className={commonStyles.management.splitScreen.details.backdrop(selectedObjectId !== undefined)}>
 			<div className={commonStyles.management.splitScreen.details.container} key={selectedObjectId?.toString()}>
 				{props.children}
 			</div>

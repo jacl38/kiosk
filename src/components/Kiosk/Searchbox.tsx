@@ -31,6 +31,7 @@ const styles = {
 	}
 }
 
+/** Searchbox component used in the kiosk menu screen */
 export default function Searchbox(props: { onSearch?: (query: string) => void }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 

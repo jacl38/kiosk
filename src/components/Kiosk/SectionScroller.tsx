@@ -45,6 +45,7 @@ type SectionScrollerProps = {
 	onSelect?: (id: any) => void
 }
 
+/** Used in the category selector in the kiosk menu screen */
 export default function SectionScroller(props: SectionScrollerProps) {
 	const { sections, onSelect } = props;
 	const [selectedID, setSelectedID] = useState<any>();
@@ -64,7 +65,7 @@ export default function SectionScroller(props: SectionScrollerProps) {
 	}
 
 	return <nav className={styles.outerContainer}>
-		{
+		{// While still loading data, show a skeleton UI ( ••• )
 			props.loading
 			? [...Array(8)].map((_, i) => <motion.button
 				layoutId={`${i}`}

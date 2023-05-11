@@ -1,8 +1,8 @@
 import { Order, OrderPart } from "@/menu/structures";
 import useLocalStorage from "./useLocalStorage";
-import postRequest from "@/utility/netUtil";
 import * as orderUtil from "@/utility/orderUtil";
 
+/** Hook used to store and retrive order data from the browser's local storage. */
 export default function useLocalOrder() {
 	const [current, setCurrent] = useLocalStorage("current-order", {
 		name: "",
@@ -29,24 +29,12 @@ export default function useLocalOrder() {
 	}
 
 	function clear() {
-		setCurrent(o => ({
+		setCurrent({
 			name: "",
 			notes: "",
 			parts: [],
 			phone: "",
 			timestamp: 0
-		}));
-	}
-
-	async function finalizeOrder() {
-		const request/*: OrderRequest = { intent: "order", order: current }; */ = {  };
-
-		await postRequest("order", request, async response => {
-
-
-			if(response.status === 200) {
-				clear();
-			}
 		});
 	}
 
@@ -54,6 +42,6 @@ export default function useLocalOrder() {
 		current,
 		addPart, removePart, changePart,
 		setPersonalInfo,
-		clear, finalizeOrder
+		clear
 	}
 }

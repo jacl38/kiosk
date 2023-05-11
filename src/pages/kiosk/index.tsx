@@ -33,6 +33,8 @@ export default function Order() {
 
 	const order = useLocalOrder();
 
+	// Uses url hash #c to determine when to clear
+	// data from the previous order
 	useEffect(() => {
 		if(window.location.hash === "#c") {
 			window.location.hash = "";
@@ -40,6 +42,7 @@ export default function Order() {
 		}
 	}, [order]);
 
+	// Displays a message with a link to start placing an order
 	return <div className={styles.outerContainer}>
 		<div className={styles.innerContainer}>
 			<h2 className={styles.label}>Place an order</h2>

@@ -53,6 +53,7 @@ const styles = {
 	}
 }
 
+/** Component used in the /manage/reports page to display a bar chart of sales by hour for a given day */
 export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 	const [date, setDate] = useState(() => {
 		const today = new Date();
@@ -99,6 +100,7 @@ export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 		return { volume, total }
 	}
 
+	/** Returns all hours as Date objects from midnight (12:00 AM) to 11:00 PM */
 	function getAllHours(date: Date) {
 		const midnight = new Date(date);
 		midnight.setHours(0, 0, 0, 0);
@@ -137,12 +139,14 @@ export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 	}
 
 	return <div>
+		{/* Date picker input */}
 		<input onChange={e => {
 			const selectedDate = e.target.valueAsDate;
 			selectedDate?.setTime(selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60 * 1000);
 			setDate(selectedDate ?? new Date());
 		}} className={commonStyles.management.inputBox} type="date" />
-
+		
+		{/* Radio buttons to select the type of report */}
 		<div className={styles.typeSelector.container}>
 			<div className="space-x-2">
 				<input onChange={() => setVolumeType("count")} defaultChecked id="count" type="radio" name="volume-type" />
@@ -155,14 +159,17 @@ export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 			</div>
 		</div>
 
+		{/* Shows the current selected date */}
 		<p className={tw(commonStyles.management.subtitle, "text-center")}>
 			{date.toLocaleDateString(undefined, { dateStyle: "medium" })}
 		</p>
 		
+		{/* Shows a link to download the current data as a CSV */}
 		<div className="flex justify-center mb-4 mt-2">
 			<a href={serveCSV(makeCSV(formatAsCsv()))} download={getFilename()} className={commonStyles.management.download}>Download report</a>
 		</div>
 
+		{/* Maps all hours of the selected day to bars and labels on the bar chart */}
 		<div className={styles.chart.container}>
 			{getAllHours(date).map((hour, h) => {
 				const start = mod(h - 1, 12) + 1;
@@ -176,6 +183,7 @@ export default function DailyVolume(props: { orders: Order[], menu: Menu }) {
 					? volume.volume[h]
 					: formatMoney(volume.volume[h]);
 				
+				// Determines the relative width or height of the bar on the chart
 				const proportion = volume.total === 0 ? 0 : volume.volume[h] / volume.total
 
 				return <div key={h} className={styles.chart.hour.container}>

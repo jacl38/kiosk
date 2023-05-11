@@ -1,14 +1,14 @@
-import { formatMoney } from "@/menu/moneyUtil";
 import { Item } from "@/menu/structures";
 import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil";
-import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MultiPicker from "../MultiPicker";
 import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import { ObjectId } from "mongodb";
 import useMenu from "@/hooks/useMenu";
 import ImageUpload from "../ImageUpload";
 
+/** Component used in the /manage/menu page to edit Item details */
 export default function ItemEdit(props: Item & { onChange: (item: Item & { imageData?: string }) => void }) {
 
 	const { unsaved, setUnsaved } = useUnsavedChanges();

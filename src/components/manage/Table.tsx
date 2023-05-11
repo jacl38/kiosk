@@ -39,6 +39,7 @@ const styles = {
 	)
 }
 
+// If `firstIsRowLabel` is true, use the first item in each row array as the row's label
 type TableProps = {
 	sortable?: boolean,
 	firstIsRowLabel?: boolean,
@@ -47,6 +48,7 @@ type TableProps = {
 	conditionalStyles?: (value: any) => string | undefined
 }
 
+/** Table component to show data in a sortable table with row labels and headings */
 export default function Table(props: TableProps) {
 	const [sortedColumn, setSortedColumn] = useState(0);
 	const [sortDirection, setSortDirection] = useState(false);
@@ -60,6 +62,7 @@ export default function Table(props: TableProps) {
 		}
 	}
 
+	// Sort each row by the `sortDirection` by its string value
 	const sortedRows = props.sortable
 		? props.rows.sort((a, b) => {
 			const aVal = String(a[sortedColumn]);
@@ -75,8 +78,10 @@ export default function Table(props: TableProps) {
 		<table className={styles.table}>
 			<thead className={styles.headingRow}>
 				<tr>
+					{/* Map each heading to a table heading cell */}
 					{(((props.firstIsRowLabel) ? [""] : []).concat(props.headings)).map((heading, index) => {
 
+						// If this is the sorting column, show an icon to indicate the sort direction
 						const afterIcon = (index === sortedColumn && props.sortable)
 							? sortDirection
 								? <> &#10515;</>
@@ -97,7 +102,9 @@ export default function Table(props: TableProps) {
 			</thead>
 
 			<tbody>
+				{/* Map each row to a table row */}
 				{sortedRows.map((row, rowIndex) => <tr className={styles.rowBackground} key={`table-row-${rowIndex}`}>
+					{/* Map each row item to a table data cell */}
 					{row.map((cell, cellIndex) => {
 						return <td
 							className={tw(

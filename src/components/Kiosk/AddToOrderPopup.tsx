@@ -109,6 +109,7 @@ type AddToOrderPopupProps = {
 	image?: string,
 }
 
+/** Component used in the kiosk menu to add an item to the current order */
 export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 	const [selectedAddons, setSelectedAddons] = useState<Map<ObjectId, number>>(new Map(props.addons.map(a => [a._id!, 0] as const)));
 	const [quantity, setQuantity] = useState(1);
@@ -135,12 +136,14 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 
 	const subtotal = calculatePartPrice(flattenAddons(selectedAddons, props.addons), props.selectedItem, quantity);
 
+	// Shows a blurred backdrop and a dialog on top
 	return <motion.div
 		initial={{ opacity: 0, backdropFilter: "blur(0)" }}
 		animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
 		exit={{ opacity: 0, backdropFilter: "blur(0)" }}
 		onClick={e => { e.stopPropagation(); props.backdropClicked?.(); }}
 		className={commonStyles.order.backdrop}>
+
 		<motion.div
 			onClick={e => e.stopPropagation()}
 			initial={{ translateY: 40, scale: 0.8, height: 0 }}
@@ -156,7 +159,7 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			</div>
 
 			<div className={styles.content.container}>
-				{
+				{// If the item has an image attached, show it here
 					props.image &&
 					<div className={styles.content.image} style={{ backgroundImage: `url(${props.image})` }}></div>
 				}
@@ -164,7 +167,8 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 					{props.selectedItem.description}
 				</div>
 			</div>
-			{
+
+			{// If this item has addons, show theme here
 				props.addons.length > 0 &&
 				<ul className={styles.addons.container}>
 					{props.addons.map(addon => <li key={addon._id?.toString()} className={styles.addons.addon}>
@@ -188,7 +192,7 @@ export default function AddToOrderPopup(props: AddToOrderPopupProps) {
 			<div className={styles.quantity.container}>
 				<QuantitySelector
 					defaultValue={1} min={1}
-					onChange={v => setQuantity(v)} />
+					onChange={setQuantity} />
 			</div>
 
 			<div className={styles.order.container}>

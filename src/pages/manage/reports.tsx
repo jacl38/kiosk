@@ -10,6 +10,8 @@ import { Menu } from "@/menu/menuUtil"
 import DailyVolume from "@/components/manage/reports/DailyVolume"
 import WeeklyVolume from "@/components/manage/reports/WeeklyVolume"
 
+// Set up each report type (item table, weekly/daily volume)
+// Map labels to respective element and pass in orders and menu as props
 export type ReportType = {
 	label: string,
 	element: (props: {orders: Order[], menu: Menu}) => ReactNode
@@ -22,6 +24,7 @@ const reportTypes: ReportType[] = [
 ]
 
 export default function Reports() {
+	// The index of the type of report that was selected
 	const [reportIndex, setReportIndex] = useState<number>();
 
 	const orders = useOrders("all");
@@ -29,6 +32,8 @@ export default function Reports() {
 
 	return <div className="max-w-[56rem] mx-auto space-y-4">
 		<div className="flex flex-col">
+
+			{/* Dropdown list of each report type listed in reportTypes */}
 			<select onChange={e => setReportIndex(e.target.selectedIndex - 1)} className={commonStyles.management.inputBox}>
 				<option className="hidden" disabled selected value=""></option>
 				{reportTypes.map((reportType, i) => <option
@@ -37,9 +42,12 @@ export default function Reports() {
 					{reportType.label}
 				</option>)}
 			</select>
+
 		</div>
+		
 		<div className={tw(commonStyles.management.splitScreen.details.container, `overflow-y-scroll`)}>
 			{
+				// If the report index has been selected, display the corresponding element
 				reportIndex !== undefined && menu.menu
 				? <>
 					<h2 className={tw(commonStyles.management.title, "text-center")}>{reportTypes[reportIndex].label}</h2>
@@ -48,6 +56,7 @@ export default function Reports() {
 						menu: menu.menu
 					})}
 				</>
+				// Otherwise, display a message
 				: <h2 className={tw(commonStyles.management.title, "text-center")}>Select a report type</h2>
 			}
 		</div>

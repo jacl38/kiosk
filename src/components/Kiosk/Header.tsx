@@ -11,6 +11,7 @@ const styles = {
 	)
 }
 
+/** Kiosk menu header component */
 export default function Header(props: { title?: string }) {
 	return <header className={styles.outerContainer}>
 		<Image alt="Breaking Bread Logo" src={logoSrc} width={192} height={72} />

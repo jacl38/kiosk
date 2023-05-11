@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 
+/** Hook used to store and retrieve typed data from the browser's local storage */
 const useLocalStorage = <T>(key: string, defaultValue: T) => {
 	const [storedValue, setStoredValue] = useState<T>(() => {
 		if(typeof window === "undefined") return defaultValue;

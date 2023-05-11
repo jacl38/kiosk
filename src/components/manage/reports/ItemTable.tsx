@@ -29,9 +29,11 @@ const timeFrames: TimeFrame[] = [
 	{ label: "Day", ms: 1000 * 60 * 60 * 24 },
 ];
 
+/** Component used in the /manage/reports page to display items in a table */
 export default function ItemTable(props: { orders: Order[], menu: Menu }) {
 	const [timeframeIndex, setTimeframeIndex] = useState<number>();
 
+	/** Filters item list by items within the selected timeframe */
 	function filterByTimeframe() {
 		if(timeframeIndex === undefined) return props.orders;
 
@@ -40,6 +42,7 @@ export default function ItemTable(props: { orders: Order[], menu: Menu }) {
 		return filtered;
 	}
 
+	/** Get an array of objects of type { itemName: string, soldCount: number, revenue: number } for each item */
 	function getItemQuantities() {
 		const formattedOrders = filterByTimeframe().map(o => formatOrder(o, props.menu));
 		const allItems = new Set<Item>();

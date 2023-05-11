@@ -38,6 +38,7 @@ const styles = {
 	}
 }
 
+/** Component used in the /manage/reports page to display a heatmap chart of weekly sales volume */
 export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 	const [date, setDate] = useState<Date>(() => {
 		const today = new Date();
@@ -46,6 +47,7 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 	});
 	const [volumeType, setVolumeType] = useState<"count" | "revenue">("count");
 	
+	/** Returns all days of a specified week from Sunday - Saturday */
 	function getWeekFromDate(date: Date) {
 		const weekday = date.getDay();
 		const startOfWeek = new Date(date);
@@ -120,12 +122,14 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 	}
 
 	return <div>
+		{/* Date picker input */}
 		<input onChange={e => {
 			const selectedDate = e.target.valueAsDate;
 			selectedDate?.setTime(selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60 * 1000);
 			setDate(selectedDate ?? new Date());
 		}} className={commonStyles.management.inputBox} type="date" />
 
+		{/* Radio buttons to select the type of report */}
 		<div className={styles.typeSelector.container}>
 			<div className="space-x-2">
 				<input onChange={() => setVolumeType("count")} defaultChecked id="count" type="radio" name="volume-type" />
@@ -138,37 +142,37 @@ export default function WeeklyVolume(props: { orders: Order[], menu: Menu }) {
 			</div>
 		</div>
 
+		{/* Shows the current selected week */}
 		<p className={tw(commonStyles.management.subtitle, "text-center")}>
 			Week of {getWeekFromDate(date)[0].toLocaleDateString(undefined, { dateStyle: "medium" })}
 		</p>
 
+		{/* Maps all days of the selected week to boxes in the heatmap */}
 		<div className={styles.heatmap.container}>
 
-			{
-				getWeekFromDate(date).map((day, dow) => {
-					const volume = volumeType === "count"
-						? getWeeklyCountVolume(day)
-						: getWeeklyRevenueVolume(day);
-					
-					const label = volumeType === "count"
-						? `${volume.volume[dow]} items`
-						: formatMoney(volume.volume[dow]);
-					
-					const proportion = volume.total === 0 ? 0 : volume.volume[dow] / volume.total;
+			{getWeekFromDate(date).map((day, dow) => {
+				const volume = volumeType === "count"
+					? getWeeklyCountVolume(day)
+					: getWeeklyRevenueVolume(day);
+				
+				const label = volumeType === "count"
+					? `${volume.volume[dow]} items`
+					: formatMoney(volume.volume[dow]);
+				
+				const proportion = volume.total === 0 ? 0 : volume.volume[dow] / volume.total;
+				const opacity = remap(Math.sqrt(proportion), { min: 0, max: 1 }, { min: 0.15, max: 0.85 });
+				// Opacity of the box is determined by the proportion of sales that this specified day takes up
 
-					const opacity = remap(Math.sqrt(proportion), { min: 0, max: 1 }, { min: 0.15, max: 0.85 });
-
-					return <div key={dow} className={styles.heatmap.day.container}>
-						<span className={styles.heatmap.day.label}>{day.getDate()} {day.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
-						<div className={styles.heatmap.day.box} style={{
-							backgroundColor: `rgba(0, 0, 0, ${opacity})`,
-							borderColor: `rgba(0, 0, 0, ${opacity * 0.4})`
-						}}>
-						<span className="m-auto text-white [text-shadow:0px_1.5px_4px_#000]">{(proportion * 100).toFixed(2)}% &ndash; ({label})</span>
-						</div>
+				return <div key={dow} className={styles.heatmap.day.container}>
+					<span className={styles.heatmap.day.label}>{day.getDate()} {day.toLocaleDateString(undefined, { weekday: "narrow" })}</span>
+					<div className={styles.heatmap.day.box} style={{
+						backgroundColor: `rgba(0, 0, 0, ${opacity})`,
+						borderColor: `rgba(0, 0, 0, ${opacity * 0.4})`
+					}}>
+					<span className="m-auto text-white [text-shadow:0px_1.5px_4px_#000]">{(proportion * 100).toFixed(2)}% &ndash; ({label})</span>
 					</div>
-				})
-			}
+				</div>
+			})}
 		</div>
 		<div className="flex justify-center">
 			<a href={serveCSV(makeCSV(formatAsCsv()))} download={getFilename()} className={commonStyles.management.download}>Download report</a>

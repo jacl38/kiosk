@@ -19,6 +19,7 @@ const styles = {
 	)
 }
 
+/** Component to be used with `List` as a container */
 export default function ListItem(props: { children?: ReactNode | ReactNode[], selected?: boolean, onClick?: () => void, height?: string | number }) {
 	return <li style={{ height: props.height ?? "5rem" }} className={styles.container(props.selected)}>
 		<button onClick={props.onClick} className={styles.button}></button>

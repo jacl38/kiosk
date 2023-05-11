@@ -94,8 +94,10 @@ export default function Checkout() {
 	const menu = useMenu(false);
 	const order = useLocalOrder();
 
+	// Keeps track of the order send state
 	const [sending, setSending] = useState<"none" | "sending" | "sent">("none");
 
+	// Sends a post request to the server to send the order
 	async function placeOrder() {
 		setSending("sending");
 		const body: OrderRequest = {
@@ -110,21 +112,33 @@ export default function Checkout() {
 		});
 	}
 
+	const [errorText, setErrorText] = useState<string>();
+
 	const items = itemsFromOrder(order.current, menu.menu?.item!)!;
 	const addons = addonsFromOrder(order.current, menu.menu?.addon!)!;
 	const subtotal = calculateOrderSubtotal(items, addons)!;
 	const taxRate = menu.settings?.taxRate ?? 1;
 	const total = subtotal * (1 + taxRate / 100);
 
+	useEffect(() => {
+		if(order.current.name.length === 0 && errorText !== undefined) {
+			setErrorText("Name field is required");
+		} else {
+			setErrorText("");
+		}
+	}, [order.current]);
+
 	return <>
 		<div className={styles.heading.container}>
 			<h2 className={styles.heading.label}>Let&apos;s make sure we got everything...</h2>
 		</div>
 
+		{/* Maps each order part to a CheckoutItem component and passes in the data to display */}
 		<ul className={styles.itemList}>
 			{menu.menu && order.current.parts.map(part => <CheckoutItem key={part.partID} menu={menu.menu!} part={part} />)}
 		</ul>
 
+		{/* Shows the subtotal, tax, and total */}
 		<div className={styles.totalsContainer}>
 			{
 				(subtotal !== undefined && total !== undefined) &&
@@ -138,13 +152,17 @@ export default function Checkout() {
 			}
 		</div>
 
+		{/* Shows the name, phone number, and notes input fields */}
 		<div className={styles.miscInfo.container}>
 			<div className={styles.miscInfo.inputGrid}>
 				<div>
 					<label htmlFor="order-name" className={styles.miscInfo.label}>* Name:</label>
 					<input
 						defaultValue={order.current.name}
-						onBlur={e => order.setPersonalInfo({ name: e.target.value })}
+						onBlur={e => {
+							setErrorText(e => e ?? "");
+							order.setPersonalInfo({ name: e.target.value } );
+						}}
 						id="order-name"
 						type="text"
 						className={styles.miscInfo.inputBox} />
@@ -158,6 +176,10 @@ export default function Checkout() {
 						type="tel"
 						className={styles.miscInfo.inputBox} />
 				</div>
+
+				{/* Display an error message, such as "Name field is required" */}
+				<p className="col-span-2 text-red-700 font-semibold">{errorText}</p>
+
 				<div className="col-span-2">
 					<label htmlFor="order-notes" className={styles.miscInfo.label}>Notes:</label>
 					<textarea
@@ -167,35 +189,42 @@ export default function Checkout() {
 						className={tw(styles.miscInfo.inputBox, "resize-none")} />
 				</div>
 			</div>
+
 			<button
-				disabled={sending !== "none"}
+				disabled={sending !== "none" || order.current.name === ""}
 				onClick={placeOrder}
 				className={tw(
 					commonStyles.order.button, `text-2xl mx-auto`,
-					sending !== "none" ? tw(commonStyles.order.buttonDisabled, `animate-pulse`) : "")}>
+					sending !== "none" || order.current.name === ""
+						? tw(commonStyles.order.buttonDisabled, `animate-pulse`)
+						: "")}>
 				Place Order
 			</button>
 		</div>
 
-		
 		{
+			// After sending, show a dialog to send the customer back to the main screen
 			sending === "sent" &&
 			<div className={commonStyles.order.backdrop}>
 				<motion.div
 					initial={{ opacity: 0, translateY: 40, scale: 0.8 }}
 					animate={{ opacity: 1, translateY: 0, scale: 1 }}
 					className={styles.sentBox.container}>
+
 					<div className={styles.sentBox.confirmationContainer}>
 						<span className="text-3xl font-semibold">Order placed!</span>
 						<span className="text-xl text-center">You&apos;re all set,<br />{order.current.name}.</span>
 					</div>
+
 					<div className={styles.sentBox.itemContainer}>
+						{/* Finish button attaches #c hash to url to signal to /kiosk index page to clear the saved order */}
 						<Link href="/kiosk#c" className={tw(commonStyles.order.button, "text-xl")}>Finish</Link>
 					</div>
 				</motion.div>
 			</div>
 		}
 
+		{/* Floating button to send user back to menu screen to add other items */}
 		<FloatingButton
 			action={() => router.push("/kiosk/menu")}>
 			<span className={tw(

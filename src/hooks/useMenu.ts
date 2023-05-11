@@ -5,6 +5,7 @@ import postRequest from "@/utility/netUtil";
 import { ObjectId } from "mongodb";
 import { useCallback, useEffect, useState } from "react";
 
+/** Hook used to retrieve and set data in the menu in the database */
 export default function useMenu(admin: boolean) {
 	const [menu, setMenu] = useState<Menu>();
 	const [images, setImages] = useState<{ data: string, _id: ObjectId }[]>();
@@ -13,6 +14,8 @@ export default function useMenu(admin: boolean) {
 	const [settings, setSettings] = useState<Settings>();
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
 
+	/** Function which sends a request to the server to fetch the menu and settings.
+	 *  Stores the retrieved data in states. */
 	const reFetch = useCallback(async () => {		
 		await postRequest("menu", { intent: "get" }, async response => {
 			if(response.status === 200) {
@@ -32,6 +35,7 @@ export default function useMenu(admin: boolean) {
 		});
 	}, []);
 
+	// When the hook is mounted, fetch the data
 	useEffect(() => {
 		reFetch();
 	}, [reFetch]);

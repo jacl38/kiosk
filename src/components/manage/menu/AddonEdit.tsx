@@ -1,9 +1,9 @@
 import useUnsavedChanges from "@/hooks/useUnsavedChanges";
-import { formatMoney } from "@/menu/moneyUtil";
 import { Addon } from "@/menu/structures";
 import commonStyles from "@/styles/common";
 import { useEffect, useRef, useState } from "react";
 
+/** Component used in the /manage/menu page to edit Addon details */
 export default function AddonEdit(props: Addon & { onChange: (addon: Addon) => void }) {
 	const nameInput = useRef<HTMLInputElement>(null);
 	const priceInput = useRef<HTMLInputElement>(null);

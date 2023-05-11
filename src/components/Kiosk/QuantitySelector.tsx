@@ -34,18 +34,24 @@ type QuantitySelectorProps = {
 	onChange?: (value: number) => void
 }
 
+/** Quantity selector component used in the kiosk menu for item and addon quantity selection */
 export default function QuantitySelector(props: QuantitySelectorProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	// Framer motion hook used to animate the number changing
 	const inputAnim = useAnimation();
 
 	async function addValue(value: number) {
 		if(!inputRef.current) return;
+
+		// Clamps the value between the supplied min and max in the props object
+
 		const currentValue = isNaN(inputRef.current?.valueAsNumber) ? 0 : inputRef.current.valueAsNumber;
 		const newValue = Math.round(clamp(currentValue + value, props.min, props.max));
 		inputRef.current.value = `${newValue}`;
 		props.onChange?.(newValue);
 
+		// If the value has changed, animate the number
 		if(currentValue !== newValue) {
 			inputAnim.set({
 				scale: 1.2

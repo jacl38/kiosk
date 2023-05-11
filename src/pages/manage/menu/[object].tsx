@@ -29,6 +29,8 @@ const styles = {
 	}
 }
 
+// Generic component for /manage/menu/[object], where [object] is category, item, or addon.
+// Shows the proper edit form for each object type, and manages deleting/saving
 export default function Object() {
 	const router = useRouter();
 	const objectType = router.query.object as "category" | "item" | "addon" | undefined;
@@ -38,17 +40,24 @@ export default function Object() {
 	const { id } = router.query;
 	const menu = useMenu(true);
 
+	// Hook used to prevent leaving the page if there are unsaved changes
 	const { unsaved, setUnsaved } = useUnsavedChanges();
 
+	// Finds the objectData for the object ID found in the URL
 	useEffect(() => {
+		// If the menu hasn't loaded, or there is an invalid objectType in the URL query, cancel
 		if(!menu.menuLoaded || !objectType) return;
 		const collection = menu.menu?.[objectType];
+
+		// If the collection type hasn't been found, cancel
 		if(!collection) return;
 		const foundObject = (menu.menu?.[objectType] as any[]).find(i => i?._id.toString() === id);
 
 		setObjectData(foundObject);
 	}, [menu.menu, menu.menuLoaded, router, id, objectType]);
 
+	// Provides a different error message for each object type,
+	// or if an error occurs
 	function selectMessage() {
 		switch (objectType) {
 			case "category": return "Select a category";
@@ -58,6 +67,7 @@ export default function Object() {
 		return "An error occurred. Go back and try again.";
 	}
 
+	// Returns the edit form component for the respective object type
 	function object() {
 		if(objectData === undefined) return <p className={tw(commonStyles.management.title, "text-center")}>{selectMessage()}</p>;
 		switch (objectData.type) {
@@ -67,6 +77,7 @@ export default function Object() {
 		}
 	}
 
+	// Sends a post request to the server to save the object currently displaying and refresh the item list
 	async function saveObject() {
 		if(!modifiedData || !modifiedData._id || !objectData?._id) return;
 		await menu.modifyObject(objectData?._id, modifiedData);
@@ -74,7 +85,9 @@ export default function Object() {
 		menu.reFetch();
 	}
 
+	// Sends a post request to the server to delete the object currently displaying and refresh the item list
 	async function deleteObject() {
+		// Asks the user to confirm deleting the object
 		if(objectData && objectData._id && confirm(`Really delete ${objectData.name}? This cannot be undone.`)) {
 			console.log(`Removing ${objectData.name} ${objectData._id}`);
 			await menu.removeObject(objectData.type, objectData._id);
@@ -86,6 +99,7 @@ export default function Object() {
 	return <div className={styles.outerContainer}>
 		{
 			objectData &&
+				// Delete and Save buttons
 				<div className={styles.topBar.container}>
 					<button onClick={deleteObject} className={commonStyles.management.button}>
 						<span className="text-rose-700">&#10754;</span> Delete

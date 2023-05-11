@@ -13,6 +13,7 @@ const styles = {
 	)
 }
 
+/** Component to hold `ListItem` components. Displays each in a list */
 export default function List(props: { children?: ReactNode | ReactNode[] }) {
 	return <ul className={styles.container}>
 		{props.children}

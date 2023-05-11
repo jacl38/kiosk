@@ -4,6 +4,7 @@ import commonStyles from "@/styles/common";
 import { tw } from "@/utility/tailwindUtil";
 import { useEffect, useRef, useState } from "react";
 
+/** Component used in the /manage/menu page to edit Category details */
 export default function CategoryEdit(props: Category & { onChange: (category: Category) => void }) {
 	const nameInput = useRef<HTMLInputElement>(null);
 	const descriptionInput = useRef<HTMLTextAreaElement>(null);

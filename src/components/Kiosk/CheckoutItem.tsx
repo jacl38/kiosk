@@ -80,6 +80,7 @@ type CheckoutItemProps = {
 	menu: Menu
 }
 
+/** Component used in the kiosk menu to show and edit an item in the order */
 export default function CheckoutItem(props: CheckoutItemProps) {
 	const [expanded, setExpanded] = useState(false);
 
@@ -105,6 +106,7 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 		setSelectedAddons(a => new Map(a.set(id, value)));
 	}
 
+	// Confirm with the user before deleting
 	function deleteItem() {
 		if(confirm(`Are you sure you want to remove the ${item.name}${addons.length > 0 ? ` with ${addons.length} addons` : ""}?`)) {
 			order.removePart(props.part.partID!);
@@ -128,14 +130,11 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 					transition={{ duration: 0.1 }}
 					onClick={e => e.stopPropagation()}
 					className={tw(expanded ? `w-56 h-14` : `w-24 h-10`, `flex items-center transition-all`)}>
-				{
+				{// If the item is expanded, show the quantity selector
 					expanded
 					? <QuantitySelector
 						min={1} defaultValue={props.part.quantity}
-						onChange={v => order.changePart(props.part.partID!, {
-							quantity: v
-						})}
-						/>
+						onChange={v => order.changePart(props.part.partID!, { quantity: v })} />
 					: <span className="m-auto font-semibold text-lg">{props.part.quantity}</span>
 				}
 				<span className="shrink-0">&nbsp;&times; {formatMoney(singleItemSubtotal ?? 0)}</span>
@@ -149,18 +148,20 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 		</div>
 
 		<AnimatePresence>
-			{
+			{// If the item is expanded, show the addons list and notes text field
 				expanded &&
 				<motion.div
 					onClick={e => e.stopPropagation()}
 					initial={{ height: 0 }}
 					animate={{ height: "auto" }}
 					exit={{ height: 0 }}>
+
 					<ul className={styles.addonInfo.list}>
+						{/* Map the list of all available addons to addon details and quantity selectors */}
 						{allAddons.map(addon => {
 							const quantity = selectedAddons.get(addon._id!) ?? 0;
 
-							return <ul key={addon._id?.toString()} className={styles.addonInfo.innerContainer}>
+							return <li key={addon._id?.toString()} className={styles.addonInfo.innerContainer}>
 								<div className="flex flex-col w-56">
 									<span className={styles.itemInfo.name}>{addon.name}</span>
 									<div className="flex items-center">
@@ -168,16 +169,17 @@ export default function CheckoutItem(props: CheckoutItemProps) {
 											defaultValue={quantity}
 											min={0} max={5}
 											onChange={v => changeAddonQuantity(addon._id!, v)} />
-											<span className="shrink-0">&nbsp;&times; {formatMoney(addon.price)}</span>
+										<span className="shrink-0">&nbsp;&times; {formatMoney(addon.price)}</span>
 									</div>
 								</div>
 
 								<div className="flex items-center">
 									<span className={styles.itemInfo.price}>{formatMoney(quantity * addon.price)}</span>
 								</div>
-							</ul>
+							</li>
 						})}
 					</ul>
+
 					<div className={styles.notes.container}>
 						<label htmlFor={`orderpart-${part.partID}-notes`} className={styles.notes.label}>Notes</label>
 						<textarea

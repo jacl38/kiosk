@@ -48,6 +48,7 @@ type ImageUploadProps = {
 /** Max upload size (in bytes) */
 const maxUpload = 4 * 1024 * 1024;
 
+/** Component which allows user to upload an image and returns it as a base64 url string */
 export default function ImageUpload(props: ImageUploadProps) {
 	const [image64, setImage64] = useState<string | undefined>();
 	const [url, setUrl] = useState<string | undefined>(props.defaultImg ?? "");

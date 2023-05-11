@@ -32,6 +32,7 @@ type Option = {
 	checked: boolean
 }
 
+/** Component which displays a multi-select list of options with checkboxes */
 export default function MultiPicker(props: {
 	keyId: string,
 	options: Option[],
@@ -40,7 +41,7 @@ export default function MultiPicker(props: {
 	const [checked, setChecked] = useState<any[]>(() => props.options.filter(o => o.checked).map(o => o.id));
 
 	return <ul className={styles.outerContainer}>
-		{
+		{// Maps each option to a list item
 			props.options.map((option, i) => {
 				const isChecked = checked.includes(option.id);
 
