@@ -17,12 +17,12 @@ const styles = {
 	},
 	chart: {
 		container: tw(
-			`flex lg:flex-col lg:gap-y-2 max-lg:gap-x-2`,
+			`flex max-lg:flex-col max-lg:gap-y-2 lg:gap-x-2`,
 			`overflow-x-scroll`
 		),
 		hour: {
 			container: tw(
-				`flex lg:gap-x-4 max-lg:flex-col-reverse`,
+				`flex max-lg:gap-x-4 lg:flex-col-reverse`,
 			),
 			label: tw(
 				`flex lg:justify-between items-center justify-center`,
@@ -33,15 +33,15 @@ const styles = {
 				`bg-slate-500 dark:bg-zinc-500 bg-opacity-50`,
 				`transition-colors`,
 				`rounded-md`,
-				`lg:hidden`,
+				`max-lg:hidden`,
 				`flex items-start justify-center`
 			),
 			barHorizontal: tw(
-				`max-lg:hidden`,
 				`h-6`,
 				`bg-slate-500 dark:bg-zinc-500 bg-opacity-50`,
 				`transition-colors`,
 				`rounded-md`,
+				`lg:hidden`,
 				`flex justify-end items-center`,
 			),
 			dataLabel: tw(
