@@ -5,7 +5,7 @@ import DarkButton from "@/components/DarkButton";
 import useAuth from "@/hooks/useAuth";
 import commonStyles from "@/styles/common";
 import { useRouter } from "next/router";
-import { deleteCookie } from "cookies-next";
+import { deleteCookie, getCookie } from "cookies-next";
 import withLoading from "@/components/higherOrder/withLoading";
 
 const styles = {
