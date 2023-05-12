@@ -7,7 +7,7 @@ const commonStyles = {
 			`h-full`,
 			`relative`,
 			`flex flex-col`,
-			`overflow-scroll`,
+			`overflow-auto`,
 			`text-stone-700 dark:text-stone-300`,
 			`transition-colors`,
 			`overflow-hidden`,

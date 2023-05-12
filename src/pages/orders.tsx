@@ -37,7 +37,7 @@ const styles = {
 	orderList: {
 		container: tw(
 			`flex-auto`,
-			`overflow-y-scroll`
+			`overflow-y-auto`
 		)
 	}
 }

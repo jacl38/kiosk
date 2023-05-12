@@ -45,7 +45,7 @@ export default function Reports() {
 
 		</div>
 		
-		<div className={tw(commonStyles.management.splitScreen.details.container, `overflow-y-scroll`)}>
+		<div className={tw(commonStyles.management.splitScreen.details.container, `overflow-y-auto`)}>
 			{
 				// If the report index has been selected, display the corresponding element
 				reportIndex !== undefined && menu.menu

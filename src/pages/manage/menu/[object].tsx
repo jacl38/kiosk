@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, ReactNode, useEffect, useState } from "react";
 import MenuIndex from ".";
 import ManageIndex from "..";
 import { Addon, Category, Item } from "@/menu/structures";
@@ -70,11 +70,23 @@ export default function Object() {
 	// Returns the edit form component for the respective object type
 	function object() {
 		if(objectData === undefined) return <p className={tw(commonStyles.management.title, "text-center")}>{selectMessage()}</p>;
+		let EditComponent: (props: any) => JSX.Element;
 		switch (objectData.type) {
-			case "Category": return <CategoryEdit onChange={setModifiedData} {...objectData} />
-			case "Item": return <ItemEdit onChange={setModifiedData} {...objectData} />
-			case "Addon": return <AddonEdit onChange={setModifiedData} {...objectData} />
+			case "Category": {
+				EditComponent = CategoryEdit;
+				break;
+			}
+			case "Item": {
+				EditComponent = ItemEdit;
+				break;
+			}
+			case "Addon": {
+				EditComponent = AddonEdit;
+				break;
+			}
 		}
+		if(EditComponent === undefined) return <p className={tw(commonStyles.management.title, "text-center")}>{selectMessage()}</p>;
+		return <EditComponent onChange={setModifiedData} {...objectData}/>
 	}
 
 	// Sends a post request to the server to save the object currently displaying and refresh the item list
@@ -110,7 +122,7 @@ export default function Object() {
 					</button>
 				</div>
 		}
-		<div className="h-full overflow-y-scroll">
+		<div className="h-full overflow-y-auto">
 			{object()}
 		</div>
 	</div>

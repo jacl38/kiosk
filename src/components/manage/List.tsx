@@ -3,7 +3,7 @@ import { ReactNode } from "react"
 
 const styles = {
 	container: tw(
-		`h-full overflow-y-scroll`,
+		`h-full overflow-y-auto`,
 		`space-y-2 p-2`,
 		`overflow-hidden rounded-xl`,
 		`shadow-inner shadow-stone-400 dark:shadow-gray-800`,

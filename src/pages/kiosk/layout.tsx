@@ -7,6 +7,7 @@ const styles = {
 	outerContainer: tw(
 		`bg-hotchocolate-50`,
 		`flex flex-col flex-auto`,
+		`overflow-x-hidden`
 	),
 	unpaired: {
 		outerContainer: tw(

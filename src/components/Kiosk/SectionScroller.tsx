@@ -4,7 +4,7 @@ import { MouseEvent, useEffect, useState } from "react"
 
 const styles = {
 	outerContainer: tw(
-		`overflow-x-scroll overflow-hidden`,
+		`overflow-x-auto overflow-hidden`,
 		`flex flex-auto items-center`,
 		`h-16`,
 		`space-x-4 px-4`,

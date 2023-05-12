@@ -4,7 +4,7 @@ import { useState } from "react"
 const styles = {
 	outerContainer: tw(
 		`rounded-xl`,
-		`overflow-scroll`,
+		`overflow-auto`,
 		`border-2 border-stone-300 dark:border-gray-500`,
 		`transition-colors`,
 		`w-fit max-w-full pb-1 max-h-full`

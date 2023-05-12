@@ -18,7 +18,7 @@ import { ObjectId } from "mongodb";
 const styles = {
 	tab: {
 		container: tw(
-			`flex grow overflow-x-scroll overflow-y-hidden`,
+			`flex grow overflow-x-auto overflow-y-hidden`,
 		),
 		overlay: tw(
 			`absolute inset-0`,

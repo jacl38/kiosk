@@ -165,7 +165,7 @@ export default function Index(props: { children?: ReactNode | ReactNode[] }) {
 									exit={{ opacity: 0, transition: { duration: 0 } }}
 									transition={{ duration: 0.3 }}
 									key={`tab-${tabRoute}-content`}
-									className="overflow-y-scroll h-full relative">
+									className="overflow-y-auto h-full relative">
 
 									{props.children}
 
