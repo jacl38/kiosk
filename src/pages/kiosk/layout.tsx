@@ -1,7 +1,7 @@
 import Header from "@/components/Kiosk/Header";
 import usePair from "@/hooks/usePair";
 import { tw } from "@/utility/tailwindUtil";
-import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from "react";
 
 const styles = {
 	outerContainer: tw(
@@ -39,6 +39,15 @@ export default function Kiosk(props: { children: ReactNode | ReactNode[] }) {
 	// to set a different string as the header text.
 	// An error message displays if the device pair state is invalid 
 	const [header, setHeader] = useState<string>(device.paired === "unpaired" ? "An error occurred..." : "");
+
+	// Make the tablet browser enter fullscreen mode when loading the page
+	useEffect(() => {
+		(async function () {
+			try {
+				await document.body.requestFullscreen({ navigationUI: "hide" });
+			} catch {}
+		})();
+	}, []);
 
 	return <div className={styles.outerContainer}>
 		<HeaderContext.Provider value={{ header, setHeader }}>

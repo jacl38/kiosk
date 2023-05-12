@@ -61,6 +61,15 @@ export default function Orders() {
 		return () => clearInterval(interval);
 	}, [orders, orders.reFetch]);
 
+	// Make the tablet browser enter fullscreen mode when loading the page
+	useEffect(() => {
+		(async function () {
+			try {
+				await document.body.requestFullscreen({ navigationUI: "hide" });
+			} catch {}
+		})();
+	}, []);
+
 	async function closeoutOrder(id: ObjectId) {
 		await orders.closeout(id);
 		await orders.reFetch();
