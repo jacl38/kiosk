@@ -223,6 +223,7 @@ export default function Menu(props: { children?: ReactNode | ReactNode[] }) {
 
 					{/* Shows the filter/sort button which opens the filter/sort menu on click */}
 					<button
+						disabled={selectedTab === "category"}
 						onClick={() => setShowSortMenu(true)}
 						className={tw(commonStyles.management.button, "relative aspect-square shrink-0 ml-2")}>
 							&#x1f705;
