@@ -34,7 +34,7 @@ const styles = {
 	),
 	description: {
 		container: tw(
-			`px-4 py-2`
+			`px-4 py-2`,
 		),
 		text: tw(
 			`text-xl italic text-hotchocolate-800`
