@@ -70,8 +70,6 @@ export default function Index() {
 
 						<p className={styles.authStatus(authenticated === "authenticated")}>Admin</p>
 
-						<p>test text</p>
-
 						<button
 							onClick={authenticated === "authenticated" ? logout : () => router.push("/login")}
 							className={tw(commonStyles.management.subtitle, "underline", hasAdminAccount !== "admin" ? "hidden" : "")}>
