@@ -20,7 +20,7 @@ The product is a self-order kiosk system for a fictional bakery, "Breaking Bread
 |-|-|
 
 ### The technology
-This project relies mainly on [Next.js](https://nextjs.org/) for both the frontend and backend elements, and (MongoDB)[https://www.mongodb.com/] for the database. I used Next for the ability to easily consolidate frontend (React) and backend code into one codebase, and its ease-of-deployment on [Vercel](https://vercel.com/).
+This project relies mainly on [Next.js](https://nextjs.org/) for both the frontend and backend elements, and [MongoDB](https://www.mongodb.com/) for the database. I used Next for the ability to easily consolidate frontend (React) and backend code into one codebase, and its ease-of-deployment on [Vercel](https://vercel.com/).
 
 I used [Tailwind CSS](https://tailwindcss.com/) for page styling, and [Framer Motion](https://www.framer.com/motion/) for animations.
 
